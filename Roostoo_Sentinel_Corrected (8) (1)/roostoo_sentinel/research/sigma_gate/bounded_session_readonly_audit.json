@@ -1,0 +1,39 @@
+{
+  "purpose": "read_only_after_bounded_session_interruption",
+  "server_time": 1791652819666,
+  "accounts": {
+    "spot": {
+      "BNB": {
+        "Free": 0.0,
+        "Lock": 0.0
+      },
+      "PEPE": {
+        "Free": 0.0,
+        "Lock": 0.0
+      },
+      "USD": {
+        "Free": 49978.01,
+        "Lock": 21.74
+      }
+    },
+    "margin": {},
+    "schema": "SpotWallet"
+  },
+  "short_positions": [
+    {
+      "ID": 6208,
+      "Pair": "BNB/USD",
+      "EntryPrice": 749.88,
+      "ShortQty": 0.029,
+      "Collateral": 21.74,
+      "CurrentPrice": 750.05,
+      "UnrealizedPNL": -0.00493,
+      "UnrealizedPNLPct": -0.000227,
+      "PositionValue": 21.73507,
+      "CreateTimestamp": 1791652238765,
+      "PositionStatus": "OPEN"
+    }
+  ],
+  "pending_orders": [],
+  "account_mutations": 0
+}

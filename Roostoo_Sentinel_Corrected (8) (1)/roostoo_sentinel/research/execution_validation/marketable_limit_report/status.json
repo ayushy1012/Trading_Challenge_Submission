@@ -1,0 +1,53 @@
+{
+  "mode": "paper-exchange",
+  "execution_source": "signed_roostoo_account",
+  "generated_at_utc": "2026-10-10T12:04:51+00:00",
+  "generated_at_ist": "2026-10-10T17:34:51+05:30",
+  "state": {
+    "phase": "idle",
+    "position": null,
+    "order": null,
+    "last_entry": 1791633844540,
+    "cooldown": 1791634071073,
+    "pair": "PEPE/USD",
+    "last_attempt": 1791633813799
+  },
+  "portfolio": {},
+  "last_decision": {},
+  "daily_counts": {
+    "hkt_day": "2026-10-10",
+    "entry_attempts_today": 1,
+    "accepted_entries_today": 1,
+    "rejected_entries_today": 0,
+    "unfilled_terminal_entries_today": 0,
+    "filled_entries_today": 1,
+    "filled_orders_today": 2,
+    "completed_cycles_today": 1
+  },
+  "risk": {},
+  "profitability": {},
+  "activity": {
+    "scope": "entire_recorded_mode_ledger",
+    "days_with_confirmed_filled_orders": 1,
+    "filled_orders_by_hkt_day": {
+      "2026-10-10": 2
+    },
+    "completed_cycles_by_hkt_day": {
+      "2026-10-10": 1
+    },
+    "competition_required_active_days": 8,
+    "organizer_minimum_trades_per_day_verified": false,
+    "qualification_claim": "Unknown: recorded days alone do not establish enough strategy trades each competition day.",
+    "persistent_halt_before_eight_recorded_days": false
+  },
+  "total_recorded_filled_orders": 2,
+  "total_recorded_completed_cycles": 1,
+  "recorded_realized_pnl_usd": -0.08999999999650754,
+  "recent_errors": [],
+  "fee_violation": {
+    "order_id": 3450997,
+    "role": "TAKER",
+    "fee": 0.001
+  },
+  "unresolved_writes": []
+}

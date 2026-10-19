@@ -1,0 +1,118 @@
+{
+  "selection_inputs": "2022\u20132024 development and calendar 2025 validation only",
+  "ranking": [
+    {
+      "name": "combined-conservative",
+      "passes": true,
+      "score": 0.8105506593333499,
+      "worst_validation_return": 0.09539964019213998
+    },
+    {
+      "name": "sigma-reference-corrected",
+      "passes": true,
+      "score": 0.7638668421584455,
+      "worst_validation_return": 0.14949796437342977
+    },
+    {
+      "name": "strong-gate",
+      "passes": true,
+      "score": 0.6910048881745957,
+      "worst_validation_return": 0.1314400522203325
+    },
+    {
+      "name": "shorter-gates",
+      "passes": true,
+      "score": 0.6707284251307719,
+      "worst_validation_return": 0.13926338691956297
+    },
+    {
+      "name": "volatility-shock-guard",
+      "passes": true,
+      "score": 0.6220610650224551,
+      "worst_validation_return": 0.12307523931511177
+    },
+    {
+      "name": "six-hour-sizing",
+      "passes": true,
+      "score": 0.5523351968481323,
+      "worst_validation_return": 0.11541157111621292
+    },
+    {
+      "name": "signed-covariance",
+      "passes": true,
+      "score": 0.0948769608676358,
+      "worst_validation_return": 0.05112203791715908
+    },
+    {
+      "name": "combined-signed",
+      "passes": true,
+      "score": -0.05056714088251685,
+      "worst_validation_return": 0.011354408275556782
+    }
+  ],
+  "selected": {
+    "name": "combined-conservative",
+    "pairs": [
+      "BTC/USD",
+      "ETH/USD",
+      "SOL/USD",
+      "BNB/USD",
+      "XRP/USD"
+    ],
+    "gate_lookbacks": [
+      126,
+      252,
+      540
+    ],
+    "dead_band": 0.5,
+    "vol_halflife": 72,
+    "fast_vol_halflife": 12,
+    "warmup_hours": 720,
+    "min_daily_volume": 1000000,
+    "gate_min": 0.3,
+    "short_scale": 0.5,
+    "allow_shorts": true,
+    "target_vol": 0.2,
+    "gross_cap": 0.95,
+    "major_cap": 0.4,
+    "other_cap": 0.3,
+    "cov_window": 336,
+    "cov_shrink": 0.3,
+    "shock_guard": true,
+    "signed_covariance": false,
+    "sizing_hours": 6,
+    "sizing_phase": 0,
+    "dd_soft": 0.03,
+    "dd_hard": 0.1,
+    "dd_floor": 0.25,
+    "band_abs": 0.03,
+    "band_rel": 0.2,
+    "min_trade_usd": 50,
+    "maker_fee": 0.0005,
+    "taker_fee": 0.001,
+    "maker_patience_seconds": 3600,
+    "passive_through_bps": 2,
+    "slippage_bps": 1,
+    "max_order_fraction": 0.25,
+    "probe_total_usd": 100,
+    "daily_profit": 0.0035,
+    "total_profit": 0.011,
+    "daily_loss": 0.0075,
+    "total_loss": 0.025,
+    "max_drawdown": 0.025,
+    "max_consecutive_losses": 3,
+    "runtime_dir": "runtime",
+    "data_dir": "data/sigma",
+    "base_url": "https://mock-api.roostoo.com",
+    "data_base_url": "https://data-api.binance.vision",
+    "spacing": 2.2,
+    "poll_seconds": 30,
+    "competition_start": "2026-10-04T12:00:00Z",
+    "competition_end": "2026-10-18T00:00:00+08:00",
+    "fixed_long": 0,
+    "fixed_floor": -0.042,
+    "fixed_goal": 0.0025
+  },
+  "selected_hash": "26ee5f485f47231d7957797c80a86db6ff8b51981dd56449f18541cf8cd4fe84",
+  "profitability_proven": false
+}

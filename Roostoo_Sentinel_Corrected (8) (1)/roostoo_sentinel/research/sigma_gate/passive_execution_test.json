@@ -1,0 +1,32 @@
+{
+  "purpose": "authenticated_execution_classification_not_strategy_performance",
+  "buy_order": {
+    "Pair": "BTC/USD",
+    "OrderID": 3451826,
+    "Status": "CANCELED",
+    "Role": "MAKER",
+    "ServerTimeUsage": 0.004351912,
+    "CreateTimestamp": 1791650926041,
+    "FinishTimestamp": 1791651245506,
+    "Side": "BUY",
+    "Type": "LIMIT",
+    "StopType": "GTC",
+    "Price": 83045.6,
+    "Quantity": 0.00022,
+    "FilledQuantity": 0.00022,
+    "FilledAverPrice": 0,
+    "CoinChange": 0,
+    "UnitChange": 0,
+    "CommissionCoin": "BTC",
+    "CommissionChargeValue": 0,
+    "CommissionPercent": 0.0005,
+    "OrderWalletType": "SPOT",
+    "OrderSource": "PUBLIC_API"
+  },
+  "starting_usd": 49999.87,
+  "ending_usd": 49999.87,
+  "cash_change": 0.0,
+  "pending_orders": 0,
+  "shorts": 0,
+  "inventory_zero": true
+}

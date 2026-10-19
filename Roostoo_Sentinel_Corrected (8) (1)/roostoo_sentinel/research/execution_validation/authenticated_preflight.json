@@ -1,0 +1,120 @@
+{
+  "server_time_utc": "2026-10-10T12:20:43.382000+00:00",
+  "exchange_running": true,
+  "configured_pairs": [
+    {
+      "pair": "BTC/USD",
+      "tradable": true,
+      "asset_type": "crypto",
+      "amount_precision": 5,
+      "price_precision": 2,
+      "minimum_notional": 1,
+      "spread_bps": 0.0012067093759039458,
+      "quote_volume_24h": 859262512.3899306
+    },
+    {
+      "pair": "ETH/USD",
+      "tradable": true,
+      "asset_type": "crypto",
+      "amount_precision": 4,
+      "price_precision": 2,
+      "minimum_notional": 1,
+      "spread_bps": 0.04004749632970116,
+      "quote_volume_24h": 266211025.644582
+    },
+    {
+      "pair": "BNB/USD",
+      "tradable": true,
+      "asset_type": "crypto",
+      "amount_precision": 3,
+      "price_precision": 2,
+      "minimum_notional": 1,
+      "spread_bps": 0.13367107558418811,
+      "quote_volume_24h": 49165105.22128
+    },
+    {
+      "pair": "SOL/USD",
+      "tradable": true,
+      "asset_type": "crypto",
+      "amount_precision": 3,
+      "price_precision": 2,
+      "minimum_notional": 1,
+      "spread_bps": 0.9117848187832336,
+      "quote_volume_24h": 134863546.62864
+    },
+    {
+      "pair": "XRP/USD",
+      "tradable": true,
+      "asset_type": "crypto",
+      "amount_precision": 1,
+      "price_precision": 4,
+      "minimum_notional": 1,
+      "spread_bps": 0.712783777041156,
+      "quote_volume_24h": 84584024.10226
+    },
+    {
+      "pair": "LINK/USD",
+      "tradable": true,
+      "asset_type": "crypto",
+      "amount_precision": 2,
+      "price_precision": 3,
+      "minimum_notional": 1,
+      "spread_bps": 0.772827389002238,
+      "quote_volume_24h": 13689193.66469
+    },
+    {
+      "pair": "AVAX/USD",
+      "tradable": true,
+      "asset_type": "crypto",
+      "amount_precision": 2,
+      "price_precision": 3,
+      "minimum_notional": 1,
+      "spread_bps": 0.9464767403352631,
+      "quote_volume_24h": 26941684.7139
+    },
+    {
+      "pair": "AAVE/USD",
+      "tradable": true,
+      "asset_type": "crypto",
+      "amount_precision": 3,
+      "price_precision": 2,
+      "minimum_notional": 1,
+      "spread_bps": 0.5798614131233845,
+      "quote_volume_24h": 19737076.0268
+    },
+    {
+      "pair": "SUI/USD",
+      "tradable": true,
+      "asset_type": "crypto",
+      "amount_precision": 1,
+      "price_precision": 4,
+      "minimum_notional": 1,
+      "spread_bps": 0.8956961798556944,
+      "quote_volume_24h": 52619708.58992
+    },
+    {
+      "pair": "LTC/USD",
+      "tradable": true,
+      "asset_type": "crypto",
+      "amount_precision": 3,
+      "price_precision": 2,
+      "minimum_notional": 1,
+      "spread_bps": 1.5677667163123008,
+      "quote_volume_24h": 14764664.39064
+    }
+  ],
+  "public_initial_wallet": {
+    "USD": 50000
+  },
+  "competition_initial_equity_configured": 100000.0,
+  "note": "The unauthenticated InitialWallet is generic; size from actual signed balances. This preflight NEVER places trades.",
+  "account": {
+    "free_usd": 49999.87,
+    "locked_usd": 0.0,
+    "nonzero_holdings": [],
+    "open_short_pairs": [],
+    "pending_orders": 0,
+    "short_endpoint_readable": true,
+    "short_trade_permission": "not inferred from a read; validate competition permission before enabling shorts"
+  }
+}

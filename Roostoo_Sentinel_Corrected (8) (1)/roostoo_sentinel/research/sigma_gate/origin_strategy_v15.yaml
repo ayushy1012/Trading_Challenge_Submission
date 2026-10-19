@@ -1,0 +1,64 @@
+# Team105 production strategy configuration. Every live change must be a git
+# commit to this file (or code) with a CHANGELOG entry -- see docs/CHANGE_CONTROL.md.
+version: "v1.5-endgame-optimised"
+
+strategy:
+  sleeves: ["tgate"]
+  prior_weights: {tgate: 1.0}
+  universe: ["BTC/USD", "ETH/USD", "SOL/USD", "BNB/USD", "XRP/USD"]
+  # v1.2 end-game (2026-10-08): lookbacks x0.75 (5.25d/10.5d/22.5d) to match the ~9 days left;
+  # x0.75 was on the pre-launch robustness plateau (research/endgame.py, R7). v1.1 used [168, 336, 720].
+  gate_lookbacks: [126, 252, 540]
+  gate_dead_band: 0.5                  # gate flips only when |z| > 0.5 sigma (R6: kills hourly churn)
+  vol_halflife: 72
+  min_history_h: 720
+  min_daily_usd: 1000000              # universe is whitelisted majors; OKX fallback volumes are smaller
+
+policy:
+  mode: long_short                     # shorts only when the coin's own gates point down
+  sizing: absolute
+  short_regime_max: 2.0                # no market-level veto on shorts (gate is per coin)
+  short_scale: 0.5                     # half-size shorts: research -> lower MaxDD, higher Sharpe
+  enter: 0.30
+  exit: 0.10
+  target_vol_ann: 0.30
+  max_gross: 0.95                      # 1x rule, minus a 5% cash buffer for fees / rounding
+  max_weight: 0.30
+  max_weight_major: 0.40
+  # v1.3 (2026-10-10, tournament end-game, chosen by the team): fixed 60 % net-long inverse-vol basket,
+  # gates ignored; go flat (sticky, market orders) if contest return <= -4.5 % to protect the top-20 cut.
+  # v1.5 (R10 multivariable optimisation, out-of-sample validated): 90 % exposure, floor -4.2 %.
+  endgame_long: 0.90
+  endgame_floor_return: -0.042
+  # v1.4 (R9 stochastic-control analysis): lock in once the contest return reaches +0.25 % -> flat for good.
+  endgame_goal_return: 0.0025
+  dd_soft: 0.06                        # v1.2: was 0.03 -- the brake protected a lead; now we are behind
+  dd_hard: 0.15                        # v1.2: was 0.10
+  dd_floor: 0.25
+  dd_peak_window_h: 336                # drawdown from rolling 14-day peak
+  band_abs: 0.03                       # trade a name only if |dw| > 3% NAV ...
+  band_rel: 0.20                       # ... or > 20% of its target
+  min_trade_usd: 50
+
+execution:
+  use_maker: true                      # passive limit at the touch first (5 bps vs 10 bps)
+  maker_patience: 1                    # after one unfilled hour, cross as taker
+  touch_bps: 2.0
+  slippage_bps: 1.0
+
+risk:
+  max_order_frac: 0.25
+  breaker_dd: 0.15
+  breaker_cooldown_h: 12
+  max_orders_per_cycle: 20
+  max_orders_per_hour: 40
+
+live:
+  lookback_h: 1440                     # 60 days of hourly bars kept in memory
+  cycle_offset_s: 90                   # run 90s after the hour so the bar is closed everywhere
+  activity_guard_hour_utc: 12          # from 12:00 UTC (17:30 IST), retry hourly until the day has enough fills
+  min_fills_per_day: 2                 # rule: ">= 8 active trading days with enough trades each day"
+  cycle_on_start: true
+  # Contest opens Oct 4 20:00 HKT = Oct 4 12:00 UTC = 17:30 IST (organizer). Before this the bot runs, logs
+  # and computes targets on the competition account but sends no orders.
+  trade_not_before_utc: "2026-10-04T12:00:00"

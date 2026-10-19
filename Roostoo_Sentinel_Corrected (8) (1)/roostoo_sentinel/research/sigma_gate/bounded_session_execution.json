@@ -1,0 +1,212 @@
+{
+  "purpose": "authenticated_bounded_execution_not_profit_test",
+  "starting_usd": 49999.82,
+  "ending_usd": 49999.72,
+  "cash_change": -0.1,
+  "remaining_positions": 0,
+  "pending_orders": 0,
+  "session": {
+    "deadline_ms": 1791652208558,
+    "stopping": true,
+    "complete": true,
+    "cleanup_verified": true,
+    "interrupted_by_auto_review": true
+  },
+  "fills": [
+    {
+      "id": "a48df9a9ee9fa6fb6ef6d7dcfedd88ea897ee14473068bea4b25145033041b8d",
+      "timestamp_ms": 1791652215071,
+      "pair": "BTC/USD",
+      "side": "SHORT_OPEN",
+      "quantity": 0.00032,
+      "response": {
+        "Success": true,
+        "ID": 6207,
+        "Pair": "BTC/USD",
+        "OrderType": "MARKET",
+        "EntryPrice": 83064.01,
+        "ShortQty": 0.00032,
+        "Collateral": 26.58,
+        "OpenFee": 0.02658,
+        "Status": "OPEN",
+        "CreateTimestamp": 1791652146945
+      },
+      "mode": "paper-exchange",
+      "purpose": "allocation"
+    },
+    {
+      "id": "517515f1c67fecd618c59cde7caba1a8b18f81b2e49f8a476b1c68e7e28df380",
+      "timestamp_ms": 1791652307197,
+      "pair": "BNB/USD",
+      "side": "SHORT_OPEN",
+      "quantity": 0.029,
+      "response": {
+        "Success": true,
+        "ID": 6208,
+        "Pair": "BNB/USD",
+        "OrderType": "MARKET",
+        "EntryPrice": 749.88,
+        "ShortQty": 0.029,
+        "Collateral": 21.74,
+        "OpenFee": 0.021746,
+        "Status": "OPEN",
+        "CreateTimestamp": 1791652239267
+      },
+      "mode": "paper-exchange",
+      "purpose": "allocation"
+    },
+    {
+      "id": "a00cdf88d1c91bc72ed3e2c4c5de13d051c05cc02e83ebac84b09d00a1649fe5",
+      "timestamp_ms": 1791653045151,
+      "pair": "BTC/USD",
+      "side": "SHORT_CLOSE",
+      "quantity": 0.00032,
+      "response": {
+        "Success": true,
+        "ClosePrice": 83050.01,
+        "RealizedPNL": 0.0044800000000000005,
+        "CloseFee": 0.026576,
+        "ReturnAmount": 26.557904,
+        "ClosedQty": 0.00032,
+        "FullyClosed": true
+      },
+      "mode": "paper-exchange",
+      "purpose": "risk_reduction",
+      "closed_or_dust_position_net_pnl": -0.048676
+    },
+    {
+      "id": "2043ff709f78d783119b37ed0284768fccad968bff558d1825e9c71ee0ba678a",
+      "timestamp_ms": 1791653045151,
+      "pair": "BNB/USD",
+      "side": "SHORT_CLOSE",
+      "quantity": 0.029,
+      "response": {
+        "Success": true,
+        "ClosePrice": 750.03,
+        "RealizedPNL": -0.0043499999999993405,
+        "CloseFee": 0.02175,
+        "ReturnAmount": 21.7139,
+        "ClosedQty": 0.029,
+        "FullyClosed": true
+      },
+      "mode": "paper-exchange",
+      "purpose": "interrupted_test_cleanup",
+      "closed_or_dust_position_net_pnl": -0.04784599999999934
+    }
+  ],
+  "intents": [
+    {
+      "id": "a48df9a9ee9fa6fb6ef6d7dcfedd88ea897ee14473068bea4b25145033041b8d",
+      "status": "done",
+      "payload": {
+        "pair": "BTC/USD",
+        "side": "SHORT_OPEN",
+        "quantity": "0.00032",
+        "type": "MARKET",
+        "price": null,
+        "before_qty": 0.0,
+        "before_usd": 49999.82,
+        "request_timestamp": 1791652143493,
+        "mode": "paper-exchange",
+        "reason": "allocation",
+        "config_hash": "26ee5f485f47231d7957797c80a86db6ff8b51981dd56449f18541cf8cd4fe84",
+        "commit": "924eebb6586189f2d6006eae2c5160810e97f0d1+dirty"
+      },
+      "response": {
+        "Success": true,
+        "ID": 6207,
+        "Pair": "BTC/USD",
+        "OrderType": "MARKET",
+        "EntryPrice": 83064.01,
+        "ShortQty": 0.00032,
+        "Collateral": 26.58,
+        "OpenFee": 0.02658,
+        "Status": "OPEN",
+        "CreateTimestamp": 1791652146945
+      },
+      "created_ms": 1791652143493
+    },
+    {
+      "id": "517515f1c67fecd618c59cde7caba1a8b18f81b2e49f8a476b1c68e7e28df380",
+      "status": "done",
+      "payload": {
+        "pair": "BNB/USD",
+        "side": "SHORT_OPEN",
+        "quantity": "0.029",
+        "type": "MARKET",
+        "price": null,
+        "before_qty": 0.0,
+        "before_usd": 49973.21,
+        "request_timestamp": 1791652235162,
+        "mode": "paper-exchange",
+        "reason": "allocation",
+        "config_hash": "26ee5f485f47231d7957797c80a86db6ff8b51981dd56449f18541cf8cd4fe84",
+        "commit": "924eebb6586189f2d6006eae2c5160810e97f0d1+dirty"
+      },
+      "response": {
+        "Success": true,
+        "ID": 6208,
+        "Pair": "BNB/USD",
+        "OrderType": "MARKET",
+        "EntryPrice": 749.88,
+        "ShortQty": 0.029,
+        "Collateral": 21.74,
+        "OpenFee": 0.021746,
+        "Status": "OPEN",
+        "CreateTimestamp": 1791652239267
+      },
+      "created_ms": 1791652235162
+    },
+    {
+      "id": "a00cdf88d1c91bc72ed3e2c4c5de13d051c05cc02e83ebac84b09d00a1649fe5",
+      "status": "done",
+      "payload": {
+        "pair": "BTC/USD",
+        "side": "SHORT_CLOSE",
+        "quantity": "0.00032",
+        "type": "MARKET",
+        "price": null,
+        "before_qty": -0.00032,
+        "before_usd": 49951.45,
+        "request_timestamp": 1791652327567,
+        "mode": "paper-exchange",
+        "reason": "risk_reduction",
+        "config_hash": "26ee5f485f47231d7957797c80a86db6ff8b51981dd56449f18541cf8cd4fe84",
+        "commit": "924eebb6586189f2d6006eae2c5160810e97f0d1+dirty"
+      },
+      "response": {
+        "Success": true,
+        "ClosePrice": 83050.01,
+        "RealizedPNL": 0.0044800000000000005,
+        "CloseFee": 0.026576,
+        "ReturnAmount": 26.557904,
+        "ClosedQty": 0.00032,
+        "FullyClosed": true
+      },
+      "created_ms": 1791652327567
+    },
+    {
+      "id": "2043ff709f78d783119b37ed0284768fccad968bff558d1825e9c71ee0ba678a",
+      "status": "done",
+      "payload": {
+        "pair": "BNB/USD",
+        "side": "SHORT_CLOSE",
+        "quantity": "0.029",
+        "before_qty": -0.029,
+        "reason": "interrupted_test_cleanup",
+        "mode": "paper-exchange",
+        "owned_position_id": 6208
+      },
+      "response": {
+        "Success": true,
+        "ClosePrice": 750.03,
+        "RealizedPNL": -0.0043499999999993405,
+        "CloseFee": 0.02175,
+        "ReturnAmount": 21.7139,
+        "ClosedQty": 0.029,
+        "FullyClosed": true
+      },
+      "created_ms": 1791652959874
+    }
+  ]
+}

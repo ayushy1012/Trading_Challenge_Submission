@@ -1,0 +1,76 @@
+{"timestamp_ms": 1791633813799, "event": "marketable_probe_intent", "pair": "PEPE/USD", "notional_ceiling": 20.0, "purpose": "Measure LIMIT role/fee; this spread-paying round trip is not expected to profit."}
+{"timestamp_ms": 1791633813799, "event": "tick_order_intent", "intent": "b6ddbac3076efcf0c099316cf882060e10ec51d60f1d09351813d829be56b9a6", "mode": "paper-exchange", "config_hash": "346d9ad31209517d13d7a6db8252a5fe7796557cecb7ef15584ac6603ca25671", "commit": "da762d46d057db8f3e95379b7de4623906a6ea4e+dirty", "pair": "PEPE/USD", "side": "BUY", "quantity": "4962000", "price": "0.00000403", "type": "LIMIT", "before_qty": 0.0, "before_usd": 49999.96, "request_timestamp": 1791633813799}
+{"timestamp_ms": 1791633813799, "event": "tick_order_accepted", "order_id": 3450990, "pair": "PEPE/USD", "side": "BUY", "price": "0.00000403", "quantity": "4962000", "status": "FILLED", "role": "TAKER", "mode": "paper-exchange", "config_hash": "346d9ad31209517d13d7a6db8252a5fe7796557cecb7ef15584ac6603ca25671", "commit": "da762d46d057db8f3e95379b7de4623906a6ea4e+dirty"}
+{"timestamp_ms": 1791633844540, "event": "tick_order_status", "order_id": 3450990, "pair": "PEPE/USD", "side": "BUY", "status": "FILLED", "role": "TAKER", "limit_price": 4.03e-06, "filled_quantity": 4962000.0, "average_fill_price": 4.03e-06, "age_seconds": 30.741, "bid": 4.02e-06, "ask": 4.03e-06, "last": 4.03e-06, "distance_to_executable_quote_ticks": 0.0, "quote_crossed_but_pending": false, "mode": "paper-exchange", "config_hash": "346d9ad31209517d13d7a6db8252a5fe7796557cecb7ef15584ac6603ca25671", "commit": "da762d46d057db8f3e95379b7de4623906a6ea4e+dirty"}
+{"timestamp_ms": 1791633844540, "event": "tick_order_terminal", "pair": "PEPE/USD", "side": "BUY", "quantity": 4962000.0, "price": 4.03e-06, "fee_rate": 0.001, "order_id": 3450990, "role": "TAKER", "status": "FILLED", "commission_coin": "USD", "commission_amount": 0.019996, "pnl_usd": null, "mode": "paper-exchange", "config_hash": "346d9ad31209517d13d7a6db8252a5fe7796557cecb7ef15584ac6603ca25671", "commit": "da762d46d057db8f3e95379b7de4623906a6ea4e+dirty"}
+{"timestamp_ms": 1791633844540, "event": "tick_order_intent", "intent": "2762a49342e0b35a031e2e2c0f98a16afc8a1f00a4624ed21028bfe0c13b563a", "mode": "paper-exchange", "config_hash": "346d9ad31209517d13d7a6db8252a5fe7796557cecb7ef15584ac6603ca25671", "commit": "da762d46d057db8f3e95379b7de4623906a6ea4e+dirty", "pair": "PEPE/USD", "side": "SELL", "quantity": "4962000", "price": "0.00000402", "type": "LIMIT", "before_qty": 4962000.0, "before_usd": 49979.94, "request_timestamp": 1791633844540}
+{"timestamp_ms": 1791633844540, "event": "tick_order_accepted", "order_id": 3450997, "pair": "PEPE/USD", "side": "SELL", "price": "0.00000402", "quantity": "4962000", "status": "FILLED", "role": "TAKER", "mode": "paper-exchange", "config_hash": "346d9ad31209517d13d7a6db8252a5fe7796557cecb7ef15584ac6603ca25671", "commit": "da762d46d057db8f3e95379b7de4623906a6ea4e+dirty"}
+{"timestamp_ms": 1791633891073, "event": "tick_order_status", "order_id": 3450997, "pair": "PEPE/USD", "side": "SELL", "status": "FILLED", "role": "TAKER", "limit_price": 4.02e-06, "filled_quantity": 4962000.0, "average_fill_price": 4.02e-06, "age_seconds": 46.533, "bid": 4.02e-06, "ask": 4.03e-06, "last": 4.03e-06, "distance_to_executable_quote_ticks": 0.0, "quote_crossed_but_pending": false, "mode": "paper-exchange", "config_hash": "346d9ad31209517d13d7a6db8252a5fe7796557cecb7ef15584ac6603ca25671", "commit": "da762d46d057db8f3e95379b7de4623906a6ea4e+dirty"}
+{"timestamp_ms": 1791633891073, "event": "tick_order_terminal", "pair": "PEPE/USD", "side": "SELL", "quantity": 4962000.0, "price": 4.02e-06, "fee_rate": 0.001, "order_id": 3450997, "role": "TAKER", "status": "FILLED", "commission_coin": "USD", "commission_amount": 0.019947, "pnl_usd": -0.08999999999650754, "mode": "paper-exchange", "config_hash": "346d9ad31209517d13d7a6db8252a5fe7796557cecb7ef15584ac6603ca25671", "commit": "da762d46d057db8f3e95379b7de4623906a6ea4e+dirty"}
+{"timestamp_ms": 1791633891073, "event": "tick_cycle_closed", "pair": "PEPE/USD", "pnl": -0.08999999999650754, "cost": 20.0199999999968, "return": -0.004495504495330766, "cycle_closed": true, "evidence_version": 2, "mode": "paper-exchange", "config_hash": "346d9ad31209517d13d7a6db8252a5fe7796557cecb7ef15584ac6603ca25671", "commit": "da762d46d057db8f3e95379b7de4623906a6ea4e+dirty", "order_id": 3450997, "cycle_id": 3450990, "cycle_pnl": -0.08999999999650754, "cycle_cost": 20.0199999999968, "dust_cost_writeoff_usd": 0.0, "exit_type": "LIMIT"}
+{
+  "purpose": "TEST LIMIT role classification; not a strategy-profit sample",
+  "cleanup_confirmed": true,
+  "start_usd": {
+    "Free": 49999.96,
+    "Lock": 0.0
+  },
+  "end_usd": {
+    "Free": 49999.87,
+    "Lock": 0.0
+  },
+  "observed_cash_change": -0.08999999999650754,
+  "filled_orders": [
+    {
+      "id": "3450990",
+      "timestamp_ms": 1791633844540,
+      "pair": "PEPE/USD",
+      "side": "BUY",
+      "quantity": 4962000.0,
+      "price": 4.03e-06,
+      "fee_rate": 0.001,
+      "order_id": 3450990,
+      "role": "TAKER",
+      "status": "FILLED",
+      "commission_coin": "USD",
+      "commission_amount": 0.019996,
+      "pnl_usd": null,
+      "mode": "paper-exchange",
+      "config_hash": "346d9ad31209517d13d7a6db8252a5fe7796557cecb7ef15584ac6603ca25671",
+      "commit": "da762d46d057db8f3e95379b7de4623906a6ea4e+dirty"
+    },
+    {
+      "id": "3450997",
+      "timestamp_ms": 1791633891073,
+      "pair": "PEPE/USD",
+      "side": "SELL",
+      "quantity": 4962000.0,
+      "price": 4.02e-06,
+      "fee_rate": 0.001,
+      "order_id": 3450997,
+      "role": "TAKER",
+      "status": "FILLED",
+      "commission_coin": "USD",
+      "commission_amount": 0.019947,
+      "pnl_usd": -0.08999999999650754,
+      "mode": "paper-exchange",
+      "config_hash": "346d9ad31209517d13d7a6db8252a5fe7796557cecb7ef15584ac6603ca25671",
+      "commit": "da762d46d057db8f3e95379b7de4623906a6ea4e+dirty"
+    }
+  ],
+  "pending_orders": [],
+  "final_wallet": {
+    "BNB": {
+      "Free": 0.0,
+      "Lock": 0.0
+    },
+    "PEPE": {
+      "Free": 0.0,
+      "Lock": 0.0
+    },
+    "USD": {
+      "Free": 49999.87,
+      "Lock": 0.0
+    }
+  }
+}

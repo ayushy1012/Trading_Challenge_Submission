@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "<stdin>", line 5, in <module>
+  File "<frozen runpy>", line 287, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "research/probe_sigma_short.py", line 63, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "research/probe_sigma_short.py", line 41, in main
+    if len(matches)!=1:raise ApiError('Short intent ambiguous; no resend or unverified close')
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sentinel.api.ApiError: Short intent ambiguous; no resend or unverified close

@@ -1,0 +1,202 @@
+{
+  "mode": "paper-exchange",
+  "execution_source": "signed_roostoo_account",
+  "generated_at_utc": "2026-10-10T12:04:51+00:00",
+  "generated_at_ist": "2026-10-10T17:34:51+05:30",
+  "state": {
+    "phase": "idle",
+    "position": null,
+    "order": null,
+    "last_entry": 0,
+    "cooldown": 1791633776445,
+    "pair": "PEPE/USD",
+    "last_attempt": 1791632976055
+  },
+  "portfolio": {
+    "timestamp_ms": 1791633596445,
+    "equity": 49999.96,
+    "liquidation_equity": 49999.96,
+    "risk": {
+      "mode": "paper-exchange",
+      "halted": false,
+      "halt_reasons": [],
+      "new_halts": [],
+      "day_hkt": "2026-10-10",
+      "liquidation_equity": 49999.96,
+      "initial_equity": 49999.96,
+      "initial_equity_source": "first_observed_equity",
+      "day_start_equity": 49999.96,
+      "peak_equity": 49999.96,
+      "total_pnl_usd": 0.0,
+      "daily_pnl_usd": 0.0,
+      "total_return": 0.0,
+      "daily_return": 0.0,
+      "drawdown": 0.0,
+      "consecutive_losses_today": 0,
+      "thresholds": {
+        "total_profit_equity": 50549.959559999996,
+        "daily_profit_equity": 50174.95986,
+        "total_loss_equity": 48749.960999999996,
+        "daily_loss_equity": 49624.9603,
+        "drawdown_equity": 48749.960999999996
+      },
+      "profitability_failures": []
+    },
+    "profitability": {
+      "PEPE/USD": {
+        "completed_cycles_for_policy": 0,
+        "window_cycles": 0,
+        "verified_for_scaling": false,
+        "win_rate": 0.0,
+        "win_rate_lower_90pct": 0.0,
+        "breakeven_win_rate": 0.8851751574236097,
+        "required_observed_win_rate": 0.9051751574236098,
+        "mean_net_cycle_return": null,
+        "mean_return_block_lower_90pct": null,
+        "modeled_win_return": 0.0014853252487565527,
+        "modeled_loss_return": 0.011450248756218907,
+        "conservative_win_return": 0.0014853252487565527,
+        "conservative_loss_return": 0.011450248756218907,
+        "observed_worst_loss_return": 0.0,
+        "conservative_expectancy_at_lower_win_rate": -0.011450248756218907,
+        "profit_factor": null,
+        "evidence_source": "completed_cycles_for_current_mode_and_config",
+        "confidence_caveat": "Descriptive dependent-sample checks; no future-return guarantee.",
+        "mode": "paper-exchange",
+        "config_hash": "85a49b1a1ce3a1bc5f1f8033885d26a5640c92751aa13f9d2ae36c7878d1b2b6"
+      }
+    },
+    "free_usd": 49999.96,
+    "locked_usd": 0.0,
+    "phase": "idle",
+    "pair": "PEPE/USD",
+    "hkt_day": "2026-10-10",
+    "entry_attempts_today": 1,
+    "accepted_entries_today": 1,
+    "rejected_entries_today": 0,
+    "unfilled_terminal_entries_today": 1,
+    "filled_entries_today": 0,
+    "filled_orders_today": 0,
+    "completed_cycles_today": 0,
+    "mode": "paper-exchange",
+    "config_hash": "85a49b1a1ce3a1bc5f1f8033885d26a5640c92751aa13f9d2ae36c7878d1b2b6",
+    "commit": "6877b29fc98f5aa0454ca2074a6a618d9130114b+dirty"
+  },
+  "last_decision": {
+    "timestamp_ms": 1791633596445,
+    "reason": "bounded_session_time_limit",
+    "hkt_day": "2026-10-10",
+    "entry_attempts_today": 1,
+    "accepted_entries_today": 1,
+    "rejected_entries_today": 0,
+    "unfilled_terminal_entries_today": 1,
+    "filled_entries_today": 0,
+    "filled_orders_today": 0,
+    "completed_cycles_today": 0,
+    "mode": "paper-exchange",
+    "config_hash": "85a49b1a1ce3a1bc5f1f8033885d26a5640c92751aa13f9d2ae36c7878d1b2b6",
+    "commit": "6877b29fc98f5aa0454ca2074a6a618d9130114b+dirty"
+  },
+  "daily_counts": {
+    "hkt_day": "2026-10-10",
+    "entry_attempts_today": 1,
+    "accepted_entries_today": 1,
+    "rejected_entries_today": 0,
+    "unfilled_terminal_entries_today": 1,
+    "filled_entries_today": 0,
+    "filled_orders_today": 0,
+    "completed_cycles_today": 0
+  },
+  "risk": {
+    "mode": "paper-exchange",
+    "halted": false,
+    "halt_reasons": [],
+    "new_halts": [],
+    "day_hkt": "2026-10-10",
+    "liquidation_equity": 49999.96,
+    "initial_equity": 49999.96,
+    "initial_equity_source": "first_observed_equity",
+    "day_start_equity": 49999.96,
+    "peak_equity": 49999.96,
+    "total_pnl_usd": 0.0,
+    "daily_pnl_usd": 0.0,
+    "total_return": 0.0,
+    "daily_return": 0.0,
+    "drawdown": 0.0,
+    "consecutive_losses_today": 0,
+    "thresholds": {
+      "total_profit_equity": 50549.959559999996,
+      "daily_profit_equity": 50174.95986,
+      "total_loss_equity": 48749.960999999996,
+      "daily_loss_equity": 49624.9603,
+      "drawdown_equity": 48749.960999999996
+    },
+    "profitability_failures": []
+  },
+  "profitability": {
+    "PEPE/USD": {
+      "completed_cycles_for_policy": 0,
+      "window_cycles": 0,
+      "verified_for_scaling": false,
+      "win_rate": 0.0,
+      "win_rate_lower_90pct": 0.0,
+      "breakeven_win_rate": 0.8851751574236097,
+      "required_observed_win_rate": 0.9051751574236098,
+      "mean_net_cycle_return": null,
+      "mean_return_block_lower_90pct": null,
+      "modeled_win_return": 0.0014853252487565527,
+      "modeled_loss_return": 0.011450248756218907,
+      "conservative_win_return": 0.0014853252487565527,
+      "conservative_loss_return": 0.011450248756218907,
+      "observed_worst_loss_return": 0.0,
+      "conservative_expectancy_at_lower_win_rate": -0.011450248756218907,
+      "profit_factor": null,
+      "evidence_source": "completed_cycles_for_current_mode_and_config",
+      "confidence_caveat": "Descriptive dependent-sample checks; no future-return guarantee.",
+      "mode": "paper-exchange",
+      "config_hash": "85a49b1a1ce3a1bc5f1f8033885d26a5640c92751aa13f9d2ae36c7878d1b2b6"
+    }
+  },
+  "activity": {
+    "scope": "entire_recorded_mode_ledger",
+    "days_with_confirmed_filled_orders": 0,
+    "filled_orders_by_hkt_day": {},
+    "completed_cycles_by_hkt_day": {},
+    "competition_required_active_days": 8,
+    "organizer_minimum_trades_per_day_verified": false,
+    "qualification_claim": "Unknown: recorded days alone do not establish enough strategy trades each competition day.",
+    "persistent_halt_before_eight_recorded_days": false
+  },
+  "total_recorded_filled_orders": 0,
+  "total_recorded_completed_cycles": 0,
+  "recorded_realized_pnl_usd": 0,
+  "recent_errors": [
+    {
+      "timestamp_ms": 1791633198917,
+      "event": "tick_api_pause",
+      "error": "Contradictory execution fields; require read-only investigation"
+    },
+    {
+      "timestamp_ms": 1791633169616,
+      "event": "tick_api_pause",
+      "error": "Contradictory execution fields; require read-only investigation"
+    },
+    {
+      "timestamp_ms": 1791633137915,
+      "event": "tick_api_pause",
+      "error": "Contradictory execution fields; require read-only investigation"
+    },
+    {
+      "timestamp_ms": 1791633108754,
+      "event": "tick_api_pause",
+      "error": "Contradictory execution fields; require read-only investigation"
+    },
+    {
+      "timestamp_ms": 1791633073662,
+      "event": "tick_api_pause",
+      "error": "Contradictory execution fields; require read-only investigation"
+    }
+  ],
+  "fee_violation": null,
+  "unresolved_writes": []
+}

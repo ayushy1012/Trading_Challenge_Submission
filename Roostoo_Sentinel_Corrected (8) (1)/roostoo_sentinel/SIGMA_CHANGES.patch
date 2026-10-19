@@ -1,0 +1,3343 @@
+diff --git a/README.md b/README.md
+index 7191b46..bdc64df 100644
+--- a/README.md
++++ b/README.md
+@@ -1,8 +1,32 @@
+ # Roostoo Sentinel
+ 
+-A selective, cost-aware trading research package and Roostoo execution bot for the October 2026 competition. Original implementation; the supplied GitHub repository was studied for architecture, not copied.
++A selective, cost-aware trading research package and Roostoo execution bot for the October 2026 competition. The Sigma extension reuses credited MIT components from DhmalTPS; see `THIRD_PARTY_LICENSES.md`.
+ 
+-**Current execution and research update:** authenticated test-account checks found the live SpotWallet schema, a pending-quantity echo combined with cent-truncated balances, and TAKER fees on crossing LIMITs. All are handled. The default is now a quiet-market pullback with thirty minutes of real quote history and a movement gate. See [PAPER_EDGE_RESEARCH.md](PAPER_EDGE_RESEARCH.md) for actual order evidence, new comparisons and upgrade instructions. Historical simulations do not establish account returns.
++## Sigma Gate update, 10 October 2026
++
++`sigma_config.json` was frozen before the new 2026 test. It trades BTC, ETH, SOL, BNB and XRP using 126/252/540-hour trend gates, a 20% annual volatility target, a fast volatility shock guard and six-hour sizing. Direction changes and risk reductions are processed each hour. Default execution uses taker costs because passive matching remains unverified on this account.
++
++The causal 2026 simulation returned **+9.58% after costs, versus +8.61% for the corrected original gates**, with maximum drawdown **5.71% versus 10.41%**. These continuous comparisons do not enable the absolute competition stops. With those stops, the conservative version exceeded 1% in **8 of 20** independently reset 14-day episodes. It lost **1.14%** in the recent seven-day continuous test. Read [SIGMA_GATE_RESEARCH.md](SIGMA_GATE_RESEARCH.md) before using either configuration. Future or competition profitability is unproven.
++
++```bash
++python -m sentinel sigma-run --mode shadow --once
++python -m sentinel sigma-backtest --start 2026-01-01T00:00:00Z --end 2026-10-10T00:00:00Z --model all_taker
++```
++
++With private test keys set as `ROOSTOO_API_KEY` and `ROOSTOO_SECRET_KEY`, read-only inspection and a bounded test are:
++
++```bash
++python -m sentinel sigma-status --remote
++python -m sentinel sigma-run --mode paper-exchange --max-minutes 3 --portfolio-cap-usd 100
++```
++
++The $100 limit is aggregate portfolio exposure. Cleanup may run beyond three minutes; the corrected adapter checks the entry deadline immediately before sending an opening request. One unresolved order pauses other writes. Account ownership, short collateral, partial fills and actual fees are reconciled before further trading. Existing holdings from another runner require their original journal and cannot be adopted automatically. Do not run the Sigma, tick and hourly bots concurrently.
++
++The package includes all source, 160 regression tests, five compressed hourly datasets, raw new study results and actual API execution evidence. Large legacy minute datasets and raw download archives can be recreated with the included scripts. `sigma_reference_config.json` provides the original gate baseline; `sigma_shorter_research_config.json` is a research alternative. Reports update approximately every minute under `runtime/reports/sigma-paper-exchange/` and remain local. No external messages are sent.
++
++The sections below describe the earlier tick and hourly work. Their results do not measure the Sigma extension.
++
++**Earlier execution and research update:** authenticated test-account checks found the live SpotWallet schema, a pending-quantity echo combined with cent-truncated balances, and TAKER fees on crossing LIMITs. All are handled. The tick configuration uses a quiet-market pullback with thirty minutes of real quote history and a movement gate. See [PAPER_EDGE_RESEARCH.md](PAPER_EDGE_RESEARCH.md) for those order checks and comparisons. Historical simulations do not establish account returns.
+ 
+ **Profit and loss controls:** the tick runner now halts at +1.10% total profit, +0.35% daily profit, −0.75% daily loss, −2.50% total loss or drawdown, and three consecutive losing cycles in a day. It cancels and reconciles an owned order before liquidating remaining inventory. Stops use estimated liquidation costs and persist in the existing ledger. [RISK_ENGINE.md](RISK_ENGINE.md) explains reset behavior, the stronger profitability gate and its limits.
+ 
+diff --git a/SIGMA_GATE_ORIGIN_LICENSE.txt b/SIGMA_GATE_ORIGIN_LICENSE.txt
+new file mode 100644
+index 0000000..7ba649c
+--- /dev/null
++++ b/SIGMA_GATE_ORIGIN_LICENSE.txt
+@@ -0,0 +1,21 @@
++MIT License
++
++Copyright (c) 2026 DhmalTPS
++
++Permission is hereby granted, free of charge, to any person obtaining a copy
++of this software and associated documentation files (the "Software"), to deal
++in the Software without restriction, including without limitation the rights
++to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++copies of the Software, and to permit persons to whom the Software is
++furnished to do so, subject to the following conditions:
++
++The above copyright notice and this permission notice shall be included in all
++copies or substantial portions of the Software.
++
++THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
++AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
++SOFTWARE.
+diff --git a/SIGMA_GATE_RESEARCH.md b/SIGMA_GATE_RESEARCH.md
+new file mode 100644
+index 0000000..6f993d8
+--- /dev/null
++++ b/SIGMA_GATE_RESEARCH.md
+@@ -0,0 +1,142 @@
++# Sigma Gate improvement and execution evidence
++
++Research completed 10 October 2026. All returns below are historical simulations unless explicitly labeled authenticated execution. The supplied test credentials were used for current Roostoo account, fee and order checks; they were not used to fabricate historical exchange fills.
++
++**Finding:** the frozen conservative variant improved the tested return-to-risk profile. From 1 January through 9 October 2026 it returned **+9.58% after costs**, with **5.71% maximum drawdown**, compared with **+8.61% and 10.41%** for the corrected original trend model. Double-cost stress remained positive. This does not establish a reliable competition strategy: the recent seven-day test lost **1.14%**, and only **8 of 20** separate 14-day simulations exceeded 1% with the profit/loss stops enabled. The uncertainty intervals include zero.
++
++## What was reused and changed
++
++The user-supplied [Sigma Gate repository](https://github.com/DhmalTPS/Sigma-Gate-Crypto-Trend-Allocation) was pinned at `64e0856d99791aab00c175687d1b354ae1490c8a`. Its published v1.1 trend model and its current v1.5 configuration are different strategies. v1.1 uses 168/336/720-hour trend gates, a 0.5-sigma deadband, inverse volatility allocation, half-sized shorts, volatility scaling, no-trade bands and a drawdown governor. The current configuration instead uses a fixed 90% long basket with a small profit lock. Its recovery objective starts from the upstream team's own contest drawdown and cannot be copied as a performance guarantee for our account.
++
++The original MIT strategy, portfolio, backtest and metric modules are preserved under `sentinel/sigma_origin/`, with the original license and attribution. The new shared policy is `sentinel/sigma.py`, the causal research engine is `sentinel/sigma_backtest.py`, and the Roostoo adapter is `sentinel/sigma_live.py`. No upstream credentials, account state or live logs are imported. Earlier documents saying the bot contains no copied third-party code describe the earlier implementation; the Sigma extension supersedes that claim.
++
++Reproducing the unmodified v1.1 components on independently downloaded data returned **+21.13%, Sharpe 0.946 and maximum drawdown 10.35%** over 25 May 2025 10:00 UTC to 2 October 2026 09:00 UTC, exclusive. This is close to the upstream published +20.87%, rather than a claim of an improvement. That reference engine allows same-close market fills and omits terminal liquidation fees. The new engine corrects those assumptions, so its results must be compared with its own corrected baseline.
++
++The frozen conservative configuration uses:
++
++| Setting | Behavior and purpose |
++|---|---|
++| Universe | BTC, ETH, SOL, BNB and XRP only; no search across winning coins |
++| Trend ensemble | 126, 252 and 540 completed hourly bars; direction changes only beyond a 0.5-sigma deadband |
++| Weak gates | Exposure follows the ensemble's absolute conviction; weak agreement leaves cash rather than renormalizing the remaining assets to full investment |
++| Volatility | 20% annual target; risk sizing uses the larger of 12-hour and 72-hour EWMA volatility |
++| Sizing schedule | Every six hours; direction changes and necessary risk reductions are processed hourly |
++| Exposure | Gross at most 95% of NAV, BTC/ETH at most 40% each, other coins at most 30%; shorts receive half-size targets |
++| Trading bands | Avoid small weight adjustments; apply exposure ceilings again after the bands |
++| Drawdown governor | Reduce exposure as the rolling 14-day drawdown moves from 3% to 10%; scaling never adds leverage |
++| Execution | Default taker execution; optional passive orders with reconciliation and a one-hour timeout |
++
++The intended economic source of profit is persistence in multi-day trends. The deadband and sizing schedule aim to avoid paying fees for small reversals; volatility sizing reduces the position when the market becomes more dangerous. Trending markets can produce positive net returns. Choppy reversals produce losses, as the recent test demonstrates. This is an allocation strategy, not a promise that individual trades will mostly win.
++
++## Data, selection and fill assumptions
++
++The new study uses **330 official Binance spot hourly archives**, each verified against its published SHA-256 checksum: 285 monthly archives from January 2022 through September 2026, plus 45 daily archives for 1–9 October 2026. There are **41,831 bars per coin**, 209,155 observations in total. `data/sigma/processed_manifest.json` records the compressed and uncompressed hashes; the original archive manifests record source URLs and checksums.
++
++All five histories have a real missing hour at **24 March 2023 13:00 UTC**. It is not forward-filled. Trend and volatility histories restart on the next contiguous segment and must complete their warmup again. Existing simulated exposure is reduced at the first observed opening price; this cannot reconstruct trading during the missing hour.
++
++`research/sigma_gate/EXPERIMENT_PLAN.md` was committed before evaluating the new candidates. Nine named candidates were compared, including the current fixed-long baseline. Development used 1 March 2022–31 December 2024, and validation used calendar 2025. Selection required positive development and validation results under both passive and all-taker models, then ranked the lower Sharpe across those cases minus twice validation drawdown. The conservative selection and full parameters were committed before the new 2026 tests. It was not selected for the highest later raw return.
++
++The upstream authors already researched parts of 2025–2026. These chronological tests therefore are **not globally untouched out-of-sample evidence**. Results, including losing candidates and recent periods, are retained instead of choosing a new winner after examining the 2026 test.
++
++The corrected engine decides at a completed candle's close, then executes no earlier than the next candle's open. It includes amount/price precision, cash limits, one-times short collateral, trading fees, a half-tick spread proxy, slippage, estimated liquidation costs and final exit fees. Borrowed short proceeds cannot fund additional purchases. Passive fills require a two-basis-point trade-through proxy and may fall back to taker execution. Historical candles cannot establish Roostoo queue priority or actual maker fills.
++
++Binance trades USDT pairs; the competition trades Roostoo USD pairs. Historical venue basis, actual bid/ask spreads, matching behavior, API delays and serial order submission remain execution uncertainties. The live adapter allows only one unresolved write, whereas the hourly simulation can execute several legs during one bar. The simulation does not add paper-only rounding credits or rebates and does not credit capped short losses; it may therefore overstate losses during extreme short squeezes. These assumptions do not establish an executable arbitrage.
++
++## Results after costs
++
++The following comparison starts each model with $100,000 on 1 January 2026 and ends before 10 October 2026 00:00 UTC. **Absolute daily/total profit and loss stops are disabled for these continuous strategy comparisons.** The allocation drawdown governor remains active. Fees and terminal liquidation costs are included. The live $100 test cap is not applied to these full-portfolio simulations.
++
++| Variant, all-taker model | Net return | Sharpe | Maximum drawdown | Fees |
++|---|---:|---:|---:|---:|
++| Corrected original gates | +8.61% | 0.72 | 10.41% | $2,438.51 |
++| Shorter gates only | +17.40% | 1.32 | 10.08% | $2,750.00 |
++| **Frozen conservative variant** | **+9.58%** | **1.13** | **5.71%** | **$1,848.77** |
++| Current upstream fixed-long/profit-lock model | +0.25% | 0.44 | 0.53% | $180.45 |
++
++The shorter-gate-only model earned more in this later test, with substantially more drawdown. Its test result was not used to revise the frozen selection. `sigma_shorter_research_config.json` preserves it as a research alternative. `sigma_reference_config.json` preserves the original gate baseline.
++
++| Frozen variant robustness case | Net return | Maximum drawdown |
++|---|---:|---:|
++| All-taker fees and one-basis-point slippage | +9.58% | 5.71% |
++| Passive trade-through proxy | +9.98% | 5.67% |
++| Double fees and double base slippage | +7.42% | 6.25% |
++| Five-basis-point execution slippage | +8.79% | 5.91% |
++
++The CLI model named `delayed` means the five-basis-point next-open execution stress above; it does **not** impose an additional full-hour delay. Testing all six UTC sizing phases produced +9.58% to +11.29%, with drawdown from 5.54% to 5.99%. This reduces dependence on a favorable clock phase.
++
++The freshly reset **3–9 October** continuous test lost **1.14%** for the frozen variant, compared with **1.83%** for the original gates. Double-cost stress lost 1.25%. The short sample's extreme annualized Sharpe should not be read as a precise forecast.
++
++Twenty nonoverlapping 14-day episodes from 2026 were each reset to new capital and state, with the complete daily and total profit/loss stops and liquidation fees enabled:
++
++| Variant | Profitable episodes | Episodes exceeding 1% | Median return |
++|---|---:|---:|---:|
++| Original gates | 11/20 | 11/20 | +1.12% |
++| Shorter gates only | 10/20 | 8/20 | −0.02% |
++| Frozen conservative variant | **9/20** | **8/20** | **−0.43%** |
++| Current upstream fixed-long model | 10/20 | 0/20 | −1.14% |
++
++The conservative variant's worst episode lost 2.51%, illustrating that a client stop is not an exact loss guarantee. It did **not** improve the observed competition win frequency. A working activity proxy of at least two simulated fills on eight days was met in 13/20 conservative episodes, but only **2/20** both met that proxy and exceeded 1%. The organizer's definition of sufficient strategy trades is not numerically verified, so this is not a qualification count. Early profit locks can conflict with the eight-active-day requirement; the bot does not manufacture activity trades.
++
++A 1,000-resample paired moving-block bootstrap gives a 90% Sharpe interval of **−1.26 to +3.28** for the conservative variant with 168-hour blocks. The interval for its Sharpe improvement over the baseline is **−0.38 to +1.11**. Both include zero. Those resampling statistics are not a probability of future profits, and the nine selection trials and prior upstream research further limit inference.
++
++## What the API key actually verified
++
++The documented Roostoo endpoints provide present quotes and account/order history, not a documented historical candle/matching replay service. Historical price backtests therefore use the checksummed public data. The supplied credentials authenticated the near-$50,000 **test account**, with real signed mock-exchange requests. No competition deployment occurred.
++
++| Test | Actual observed result |
++|---|---|
++| Passive BTC buy, order 3451826 | Accepted as MAKER/PENDING, remained unfilled, then cancellation verified; no balance change |
++| Short permission/accounting, position 6205 | $20 requested collateral became $19.92 after quantity/cents rounding; opened and fully closed; cash changed by −$0.05 |
++| Sigma BTC short, position 6207 | 0.00032 BTC opened at $83,064.01; closed at $83,050.01; both opening and closing fees charged |
++| Sigma BNB short, position 6208 | 0.029 BNB opened at $749.88; reduce-only cleanup closed at $750.03; both fees charged |
++| Sigma integration account change | $49,999.82 to $49,999.72: **−$0.10**, not a profitable strategy demonstration |
++| Final cleanup | **Zero open short positions, zero pending orders, zero non-USD holdings and zero locked USD** |
++
++The first short probe initially rejected its own collateral check because it assumed the requested $20 would remain exactly $20. It was resumed from the journal and cleaned up without another opening request. The adapter now uses the acknowledged position and actual collateral.
++
++The bounded integration test also exposed a deadline bug: reads and reconciliation were slow enough that the older running process opened the BNB position after its three-minute entry deadline. Automatic approval review blocked continuation of that run because it could add further exposure. Read-only inspection established ownership, and a separate **reduce-only** cleanup closed the remaining BNB position. The final adapter rechecks the deadline after reconciliation and immediately before any opening request. A regression test verifies an expired session cannot journal or send an entry. The fixed version was regression-tested; it was not rerun for another paid strategy round trip after cleanup.
++
++The authoritative execution evidence is `research/sigma_gate/bounded_session_execution.json`, `actual_trade_logs.csv`, the original event logs, and `bounded_session_cleanup.json`. Historical simulated trade logs live separately under `comparisons/`; their rows explicitly identify `historical_simulation`.
++
++## Paper exchange features and compatibility
++
++The official [Roostoo API documentation](https://github.com/roostoo/Roostoo-API-Documents) supports signed spot orders, querying and canceling owned orders, and one-times collateralized `/v6/short_open` and `/v6/short_close`, including `close_qty` for partial reductions. The implementation supports both documented `Wallet` and observed `SpotWallet`, omits rejected `offset=0`, checks precision and minimum order values, and retains ambiguous writes for reconciliation rather than blindly resending them.
++
++The maker discount is a legitimate cost advantage **only when an order actually fills as maker**. Crossing LIMIT orders can pay taker fees. The new account's resting BTC order did not fill, so the passive simulation is a hypothesis; default execution matches the all-taker test. Shorts pay 0.10% on each leg and are funded from available cash rather than spendable borrowed proceeds. Short losses are capped by collateral in the documented paper accounting, but that does not make an arbitrary short profitable.
++
++One-tick scalping is especially weak on the five chosen coins. With two 0.05% maker fees, a round trip needs approximately **0.10005%** gross price improvement merely to cover fees, before other friction. BTC's $0.01 tick is far smaller. Some low-priced tokens have larger percentage ticks, but their queue, fill sequence and adverse selection still need verified evidence. The earlier permitted sequential tick candidate remains available separately; combining it with Sigma is not supported by the new backtest. No free-fill, fee-rounding, stale-quote or duplicate-order profit was observed or credited.
++
++The [competition event page](https://luma.com/coghwiyt) and the team's clarified permission for sequential tick scalping remain relevant. Technical API compatibility is established for the tested account. Official acceptance of attributed strategy reuse, precise activity thresholds and the scoring cutoff are separate questions. The configured end is provisionally 18 October 00:00 Hong Kong time; confirm it against the organizers' final instructions. The protected 95% gross ceiling keeps the allocation unlevered.
++
++## Risk controls and operation
++
++The Sigma adapter has persistent **+0.35% daily profit, +1.10% total profit, −0.75% daily loss, −2.50% total loss or peak drawdown**, and **three consecutive losing completed positions** controls. Daily controls reset on the next Hong Kong day; total stops persist across restarts and configuration changes. Estimated exit costs enter the account NAV. A hit pauses entries and reconciles/cancels owned orders before flattening owned exposure. API outages, gaps and slippage can cause overshoot. There are no exchange-native bracket guarantees.
++
++It binds the journal to the credential fingerprint, refuses foreign holdings/orders or funded unverified margin-wallet accounting, checks short collateral without double-counting it, and preserves actual fees and realized short PNL. Pending orders that echo their full requested quantity with zero execution fields are not treated as fills. Partial quantities are tracked; canceled unfilled orders do not reset loss counters. Small unsellable spot dust is reported rather than hidden. The same instance lock prevents the older tick/hourly runner using the same runtime directory from running concurrently.
++
++`--portfolio-cap-usd` is an aggregate exposure budget, default **$100**. Historical full-portfolio returns do not apply to this small verification budget. Increasing it is an explicit sizing decision, not an automatic response to a favorable backtest. The $100 test cannot reasonably target a 1% gain on a $100,000 account. Do not erase the existing runtime journal to bypass a stop or ownership check.
++
++Run from the extracted `roostoo_sentinel` directory, using Python 3.11 or later:
++
++```bash
++python -m pip install -r requirements.txt
++python -m unittest discover -s tests -v
++python -m sentinel sigma-run --mode shadow --once
++python -m sentinel sigma-backtest --start 2026-01-01T00:00:00Z --end 2026-10-10T00:00:00Z --model all_taker --output research/reproduced_sigma
++python -m sentinel sigma-backtest --start 2026-01-01T00:00:00Z --end 2026-01-15T00:00:00Z --model all_taker --competition-stops --output research/reproduced_sigma_episode
++```
++
++Set private `ROOSTOO_API_KEY` and `ROOSTOO_SECRET_KEY` environment variables outside source files. `ROOSTOO_API_SECRET` is also accepted. Then inspect and, if desired, run the bounded test:
++
++```bash
++python -m sentinel sigma-status --remote
++python -m sentinel sigma-run --mode paper-exchange --max-minutes 3 --portfolio-cap-usd 100
++```
++
++`shadow` makes no account writes and reports target plans; it is not a profit simulator. `paper-exchange` places signed test-exchange orders. Optional `--passive` enables experimental maker-first spot execution; shorts and risk exits remain market orders. Reports update approximately every minute under `runtime/reports/sigma-paper-exchange/`: `summary.txt`, `trade_logs.csv` and `status.json`. They are local exports; no email, Slack or other transmission is configured. Cleanup can run past the entry deadline while it verifies a clear account.
++
++To reproduce the full research, run `research/download_sigma_data.py --help`, then `research/compare_sigma.py --stage develop`, `--stage test`, `--stage stress`, and `--stage episodes` in that order. The included frozen selection and the commit history document the original order of work. `research/reproduce_sigma_origin.py` uses fixed reference bounds, and `research/sigma_confidence.py` reproduces the uncertainty calculation. All **160 regression tests passed**, including candle-prefix causality, missing-hour handling, collateral/cash constraints, complete exit costs, account ownership, partial fills, durable stops and the entry deadline.
++
++The delivery contains source, licenses, compressed processed hourly data and new research evidence. Every candidate's generated NAV, simulated trades and summary are included. Hourly debug diagnostics are bundled for the conservative variant and original baseline; the other candidates' diagnostics can be regenerated with the comparison script. Raw archive caches and large older minute datasets are reproducible downloads. Runtime databases, credentials and Git internals are excluded. `GIT_HISTORY.txt`, the research plan, frozen selection and `SIGMA_CHANGES.patch` preserve traceability without adding a nested Git repository.
++
++The practical conclusion is that Sigma Gate is a better-supported allocation candidate than assuming every permitted paper tick will fill profitably. The conservative version reduced historical risk, but the short-horizon, activity and statistical evidence does not justify calling it a proven competition winner.
+diff --git a/THIRD_PARTY_LICENSES.md b/THIRD_PARTY_LICENSES.md
+new file mode 100644
+index 0000000..03a0c9a
+--- /dev/null
++++ b/THIRD_PARTY_LICENSES.md
+@@ -0,0 +1,13 @@
++# Sigma Gate reference components
++
++`sentinel/sigma_origin/` contains reference strategy, portfolio, backtest and
++metrics components from [DhmalTPS/Sigma-Gate-Crypto-Trend-Allocation](https://github.com/DhmalTPS/Sigma-Gate-Crypto-Trend-Allocation),
++pinned to commit `64e0856d99791aab00c175687d1b354ae1490c8a` (2026-10-10).
++Copyright (c) 2026 DhmalTPS. Their MIT license is reproduced in
++`SIGMA_GATE_ORIGIN_LICENSE.txt`; it applies to these components. The original
++team and repository retain credit. No account, state, credential or deployment
++files from their repository are used.
++
++The new Sentinel adapter and research scripts are separately identified in
++`SIGMA_GATE_RESEARCH.md`. Reported upstream returns are reference claims;
++independent reproductions and new simulations are labeled separately.
+diff --git a/research/compare_sigma.py b/research/compare_sigma.py
+new file mode 100644
+index 0000000..1f2dd04
+--- /dev/null
++++ b/research/compare_sigma.py
+@@ -0,0 +1,100 @@
++"""Small pre-recorded ablation set. Freeze validation ranking before 2026 test."""
++import argparse
++from dataclasses import asdict, replace
++import json
++from pathlib import Path
++import sys
++
++import numpy as np
++import pandas as pd
++
++sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
++from sentinel.data import read_bars
++from sentinel.sigma import SigmaConfig, candidates, prepare
++from sentinel.sigma_backtest import export, run
++
++ROOT=Path('research/sigma_gate')
++
++
++def main():
++    ap=argparse.ArgumentParser()
++    ap.add_argument('--stage',choices=['develop','test','stress','episodes'],required=True)
++    a=ap.parse_args()
++    cfg=SigmaConfig()
++    bars={p:read_bars(cfg.data_dir,p) for p in cfg.pairs}
++    ROOT.mkdir(parents=True,exist_ok=True)
++    memo={}
++    def features(c):
++        key=(c.gate_lookbacks,c.vol_halflife,c.fast_vol_halflife,c.cov_window,c.cov_shrink)
++        if key not in memo:memo[key]=prepare(bars,c)
++        return memo[key]
++    rows=[]
++    if a.stage=='develop':
++        periods={'development':('2022-03-01T00:00:00Z','2025-01-01T00:00:00Z'),'validation':('2025-01-01T00:00:00Z','2026-01-01T00:00:00Z')}
++        for c in candidates():
++            for period,(start,end) in periods.items():
++                for model in ('passive','all_taker'):
++                    res=run(features(c),c,start,end,model)
++                    path=ROOT/'comparisons'/c.name/period/model
++                    export(res,path)
++                    row={'candidate':c.name,'period':period,**res.summary}
++                    rows.append(row)
++                    print(json.dumps({k:row[k] for k in ('candidate','period','model','return','sharpe','max_drawdown','fees_usd','trades')}),flush=True)
++        frame=pd.DataFrame(rows)
++        frame.to_csv(ROOT/'development_validation.csv',index=False)
++        rank=[]
++        for c in candidates():
++            if c.fixed_long:continue
++            v=frame[(frame.candidate==c.name)&(frame.period=='validation')]
++            d=frame[(frame.candidate==c.name)&(frame.period=='development')]
++            # Require positive return in both periods under both fee models.
++            passes=bool((v['return']>0).all() and (d['return']>0).all())
++            score=float(min(v.sharpe.min(),d.sharpe.min())-2*v.max_drawdown.max())
++            rank.append({'name':c.name,'passes':passes,'score':score,'worst_validation_return':float(v['return'].min())})
++        rank.sort(key=lambda x:(x['passes'],x['score']),reverse=True)
++        chosen=rank[0]['name']
++        selected=next(c for c in candidates() if c.name==chosen)
++        freeze={'selection_inputs':'2022–2024 development and calendar 2025 validation only','ranking':rank,'selected':asdict(selected),'selected_hash':selected.fingerprint,'profitability_proven':False}
++        (ROOT/'selection_frozen.json').write_text(json.dumps(freeze,indent=2))
++        print(json.dumps({'selected_before_2026_test':chosen,'passes_prerecorded_screen':rank[0]['passes']}),flush=True)
++        return
++    frozen=json.loads((ROOT/'selection_frozen.json').read_text())
++    x=frozen['selected'];x['pairs']=tuple(x['pairs']);x['gate_lookbacks']=tuple(x['gate_lookbacks'])
++    selected=SigmaConfig(**x)
++    chosen={c.name:c for c in [candidates()[0],candidates()[1],selected,candidates()[-1]]}
++    if a.stage in {'test','stress'}:
++        periods={'test_2026':('2026-01-01T00:00:00Z','2026-10-10T00:00:00Z'),'recent_october':('2026-10-03T00:00:00Z','2026-10-10T00:00:00Z')}
++        models=('passive','all_taker') if a.stage=='test' else ('double_cost','delayed')
++        for c in chosen.values():
++            for period,(start,end) in periods.items():
++                for model in models:
++                    res=run(features(c),c,start,end,model)
++                    export(res,ROOT/'comparisons'/c.name/period/model)
++                    row={'candidate':c.name,'period':period,**res.summary};rows.append(row)
++                    print(json.dumps({k:row[k] for k in ('candidate','period','model','return','sharpe','max_drawdown','fees_usd')}),flush=True)
++        pd.DataFrame(rows).to_csv(ROOT/(a.stage+'_results.csv'),index=False)
++        if a.stage=='stress':
++            for phase in range(selected.sizing_hours):
++                c=replace(selected,sizing_phase=phase)
++                res=run(features(c),c,'2026-01-01T00:00:00Z','2026-10-10T00:00:00Z','all_taker')
++                rows.append({'candidate':c.name,'phase':phase,**res.summary})
++                print(json.dumps({'phase':phase,**{k:res.summary[k] for k in ('return','sharpe','max_drawdown')}}),flush=True)
++            pd.DataFrame([r for r in rows if 'phase' in r]).to_csv(ROOT/'phase_stress.csv',index=False)
++        return
++    # Fresh state and capital for each NON-overlapping contest; includes entries,
++    # liquidation fees and the actual persistent/daily risk controls.
++    for c in chosen.values():
++        start=pd.Timestamp('2026-01-01T00:00:00Z')
++        finish=pd.Timestamp('2026-10-10T00:00:00Z')
++        while start+pd.Timedelta(days=14)<=finish:
++            end=start+pd.Timedelta(days=14)
++            res=run(features(c),c,start,end,'all_taker',competition_stops=True)
++            counts=pd.to_datetime(res.trades.timestamp,utc=True).dt.tz_convert('Asia/Hong_Kong').dt.date.value_counts() if len(res.trades) else pd.Series(dtype=int)
++            rows.append({'candidate':c.name,'episode_start':start.isoformat(),'days_with_at_least_2_simulated_fills':int((counts>=2).sum()),**res.summary})
++            start=end
++        subset=[r for r in rows if r['candidate']==c.name]
++        print(json.dumps({'candidate':c.name,'episodes':len(subset),'positive_fraction':float(np.mean([r['return']>0 for r in subset])),'median_return':float(np.median([r['return'] for r in subset])),'greater_than_1pct':float(np.mean([r['return']>.01 for r in subset]))}),flush=True)
++    pd.DataFrame(rows).to_csv(ROOT/'independent_14day_episodes.csv',index=False)
++
++
++if __name__=='__main__':main()
+diff --git a/research/download_sigma_data.py b/research/download_sigma_data.py
+new file mode 100644
+index 0000000..2b91f05
+--- /dev/null
++++ b/research/download_sigma_data.py
+@@ -0,0 +1,61 @@
++"""Checksum-verified Sigma history. Explicit dates; completed days only."""
++import argparse
++from concurrent.futures import ThreadPoolExecutor
++import hashlib
++import io
++import json
++from pathlib import Path
++import sys
++import zipfile
++
++import pandas as pd
++
++sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
++from sentinel.data import RAW_COLUMNS, download_history, get_bytes, normalize_frame, read_bars, save_bars, symbol, validate_frame
++from sentinel.sigma import PAIRS
++
++
++def append_days(directory, start='2026-10-01', end='2026-10-09'):
++    root=Path(directory)
++    cache=root/'archives'
++    cache.mkdir(parents=True,exist_ok=True)
++    tasks=[(pair,str(day.date())) for pair in PAIRS for day in pd.date_range(start,end)]
++    def fetch(task):
++        pair,day=task
++        name=f'{symbol(pair)}-1h-{day}.zip'
++        url=f'https://data.binance.vision/data/spot/daily/klines/{symbol(pair)}/1h/{name}'
++        p=cache/name
++        b=p.read_bytes() if p.exists() else get_bytes(url)
++        check=cache/(name+'.CHECKSUM')
++        c=check.read_bytes() if check.exists() else get_bytes(url+'.CHECKSUM')
++        actual=hashlib.sha256(b).hexdigest()
++        if actual!=c.decode().split()[0]:raise ValueError(f'Checksum failed: {name}')
++        p.write_bytes(b)
++        check.write_bytes(c)
++        with zipfile.ZipFile(io.BytesIO(b)) as z:
++            raw=pd.read_csv(io.BytesIO(z.read(name[:-4]+'.csv')),header=None,names=RAW_COLUMNS)
++        frame=normalize_frame(raw)
++        if len(frame)!=24:raise ValueError(f'Incomplete UTC day: {name}')
++        return pair,frame,{'pair':pair,'day':day,'url':url,'sha256':actual,'rows':len(frame)}
++    rows=[]
++    with ThreadPoolExecutor(max_workers=8) as pool:
++        result=list(pool.map(fetch,tasks))
++    for pair in PAIRS:
++        d=normalize_frame(pd.concat([read_bars(root,pair)]+[frame for p,frame,_ in result if p==pair],ignore_index=True))
++        validate_frame(d)
++        gaps=d.timestamp.diff().dropna()
++        print(json.dumps({'pair':pair,'missing_hours':int(((gaps//3600000)-1).sum()),'gap_policy':'no invented bars; reset signal warmup after gaps'}),flush=True)
++        save_bars(root,pair,d)
++        print(json.dumps({'pair':pair,'rows':len(d),'last_open_utc':pd.to_datetime(int(d.timestamp.iloc[-1]),unit='ms',utc=True).isoformat()}),flush=True)
++    meta={'start':start,'end_inclusive':end,'archives':[m for _,_,m in result]}
++    (root/'daily_manifest.json').write_text(json.dumps(meta,indent=2))
++    return meta
++
++
++if __name__=='__main__':
++    ap=argparse.ArgumentParser()
++    ap.add_argument('--directory',default='data/sigma')
++    ap.add_argument('--daily-only',action='store_true')
++    a=ap.parse_args()
++    if not a.daily_only:download_history(list(PAIRS),'2022-01-01','2026-09-30',a.directory,workers=8)
++    append_days(a.directory)
+diff --git a/research/package_sigma.py b/research/package_sigma.py
+new file mode 100644
+index 0000000..f9b6d49
+--- /dev/null
++++ b/research/package_sigma.py
+@@ -0,0 +1,49 @@
++"""Create the complete, compact source/research delivery without private state."""
++import argparse
++import hashlib
++import json
++from pathlib import Path
++import zipfile
++
++
++def included(path,root):
++    rel=path.relative_to(root)
++    if any(p in {'.git','.venv','__pycache__','runtime','tmp','archives','daily_archives'} for p in rel.parts):
++        return False
++    if path.name in {'.env','PACKAGE_MANIFEST.json'} or path.suffix in {'.pyc','.lock','.sqlite3','.zip'}:
++        return False
++    if rel.parts[:2]==('data','sigma') and path.suffix=='.csv':
++        return False
++    if rel.parts[:2]==('data','limit_minutes') and path.suffix not in {'.json','.md','.txt'}:
++        return False
++    # Keep every candidate's NAV, fills and summary. Repeated hourly debug
++    # diagnostics remain reproducible, while the selected/baseline series are
++    # bundled for immediate inspection.
++    if path.name=='decisions.csv' and 'comparisons' in rel.parts:
++        candidate=rel.parts[rel.parts.index('comparisons')+1]
++        if candidate not in {'combined-conservative','sigma-reference-corrected'}:
++            return False
++    return path.is_file()
++
++
++def main():
++    ap=argparse.ArgumentParser()
++    ap.add_argument('--output',required=True)
++    ap.add_argument('--source-commit',required=True)
++    a=ap.parse_args()
++    root=Path(__file__).resolve().parents[1]
++    out=Path(a.output).resolve();out.parent.mkdir(parents=True,exist_ok=True)
++    files=sorted(p for p in root.rglob('*') if p.resolve()!=out and included(p,root))
++    hashes={str(p.relative_to(root)):hashlib.sha256(p.read_bytes()).hexdigest() for p in files}
++    manifest={'source_commit':a.source_commit,'upstream_commit':'64e0856d99791aab00c175687d1b354ae1490c8a','config_hash':'26ee5f485f47231d7957797c80a86db6ff8b51981dd56449f18541cf8cd4fe84','tests':json.loads((root/'research/sigma_gate/regression_result.json').read_text()),'data':json.loads((root/'data/sigma/processed_manifest.json').read_text()),'simulation_and_actual_execution_are_distinct':True,'profitability_proven':False,'files_sha256':hashes,'excludes':['Git internals','runtime journals','credentials','raw download caches','legacy minute datasets','reproducible hourly debug diagnostics for other comparison candidates']}
++    with zipfile.ZipFile(out,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
++        for p in files:z.write(p,'roostoo_sentinel/'+str(p.relative_to(root)))
++        z.writestr('roostoo_sentinel/PACKAGE_MANIFEST.json',json.dumps(manifest,indent=2)+'\n')
++    with zipfile.ZipFile(out) as z:
++        assert z.testzip() is None
++        for name,digest in hashes.items():
++            assert hashlib.sha256(z.read('roostoo_sentinel/'+name)).hexdigest()==digest,name
++    print(json.dumps({'archive':str(out),'bytes':out.stat().st_size,'files':len(files)+1,'sha256':hashlib.sha256(out.read_bytes()).hexdigest(),'crc_and_manifest_verified':True}),flush=True)
++
++
++if __name__=='__main__':main()
+diff --git a/research/probe_sigma_passive.py b/research/probe_sigma_passive.py
+new file mode 100644
+index 0000000..8513f1f
+--- /dev/null
++++ b/research/probe_sigma_passive.py
+@@ -0,0 +1,101 @@
++"""Bounded <$20 BTC maker classification, TEST wallet only; not a profit test.
++
++Every write is journaled first. Ambiguous writes are matched by exact intent,
++never resubmitted. Owned exposure is canceled/reconciled/flattened before exit.
++"""
++import argparse
++from decimal import Decimal
++import json
++from pathlib import Path
++import sys
++import time
++
++sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
++from sentinel.api import ApiError, AmbiguousWrite, Roostoo, decimal_string
++from sentinel.state import Store
++from sentinel.runner import InstanceLock
++
++
++def main():
++    ap=argparse.ArgumentParser()
++    ap.add_argument('--seconds',type=int,default=300)
++    a=ap.parse_args()
++    if not 30<=a.seconds<=600:raise ValueError('Bounded test only')
++    api=Roostoo(spacing=2.2)
++    lock=InstanceLock(Path('runtime')/'sigma_probe.lock')
++    store=Store('runtime/sigma_probe.sqlite3')
++    if store.get('started'):raise RuntimeError('Probe already ran; preserve its journal, do not repeat to manufacture activity')
++    now=api.sync_time()
++    accounts=api.balance_accounts()
++    wallet=accounts['spot']
++    pending=api.query_orders(pending_only=True)
++    shorts=api.short_positions()
++    cash=wallet['USD']['Free']
++    if not 49900<=cash<=50100 or wallet['USD']['Lock'] or pending or shorts or any(sum(v.values()) for v in accounts['margin'].values()) or any(sum(v.values()) for c,v in wallet.items() if c!='USD'):
++        raise ApiError('Probe requires the supplied clean near-$50,000 TEST wallet; competition/active accounts refused')
++    meta=api.exchange_info()['TradePairs']['BTC/USD']
++    quote=api.ticker()['Data']['BTC/USD']
++    qty=decimal_string(19/float(quote['MinAsk']),int(meta['AmountPrecision']))
++    price=decimal_string(quote['MaxBid'],int(meta['PricePrecision']))
++    if float(qty)*float(price)<=float(meta['MiniOrder']):raise ApiError('Probe below exchange minimum')
++    store.set('started',True)
++    payload={'pair':'BTC/USD','side':'BUY','quantity':qty,'price':price,'request_timestamp':api.now_ms(),'mode':'paper-exchange','purpose':'execution_classification'}
++    key=store.intent('single-btc-maker-classification',payload,payload['request_timestamp'])
++    store.event('probe_initial',{'usd':cash,'payload':payload,'max_notional':20})
++    try:
++        r=api.place_limit('BTC/USD','BUY',qty,price)
++        store.update_intent(key,'acknowledged',r)
++        oid=r['OrderDetail']['OrderID']
++    except AmbiguousWrite:
++        store.update_intent(key,'unknown')
++        oid=None
++    deadline=time.monotonic()+a.seconds
++    detail=None
++    while True:
++        try:
++            if oid is None:
++                candidates=api.query_orders(limit=100)
++                candidates=[r for r in candidates if r.get('Pair')=='BTC/USD' and r.get('Side')=='BUY' and r.get('Type')=='LIMIT' and abs(int(r.get('CreateTimestamp',0))-payload['request_timestamp'])<60000 and Decimal(str(r.get('Quantity',0)))==Decimal(qty) and Decimal(str(r.get('Price',0)))==Decimal(price)]
++                if len(candidates)!=1:raise ApiError('Ambiguous intent remains unresolved; no resend')
++                oid=candidates[0]['OrderID']
++                store.update_intent(key,'acknowledged',{'OrderDetail':candidates[0]})
++            rows=api.query_orders(order_id=oid)
++            if len(rows)!=1:raise ApiError('Owned order missing; no resend')
++            detail=rows[0]
++            store.event('probe_owned_order',{'order':detail})
++            if detail['Status'] in {'FILLED','CANCELED','CANCELLED','REJECTED'}:break
++            if time.monotonic()>=deadline:
++                try:api.cancel_order(oid)
++                except (AmbiguousWrite,ApiError):pass
++        except ApiError as e:
++            store.event('probe_read_pause',{'error':str(e)})
++        time.sleep(15)
++    store.update_intent(key,'done',{'OrderDetail':detail})
++    wallet=api.balance()
++    holding=wallet.get('BTC',{'Free':0,'Lock':0})
++    if holding['Lock']:raise ApiError('Terminal buy still locks coin inventory; preserve journal')
++    sell_qty=decimal_string(min(float(qty),holding['Free']),int(meta['AmountPrecision']))
++    if float(sell_qty)>0:
++        payload2={'pair':'BTC/USD','side':'SELL','quantity':sell_qty,'request_timestamp':api.now_ms(),'mode':'paper-exchange','purpose':'probe_cleanup'}
++        k2=store.intent('single-btc-probe-cleanup',payload2,payload2['request_timestamp'])
++        try:
++            r=api.place('BTC/USD','SELL',sell_qty)
++            store.update_intent(k2,'acknowledged',r)
++        except AmbiguousWrite:
++            store.update_intent(k2,'unknown')
++            raise ApiError('Cleanup status unknown; preserve journal and reconcile before any other bot') from None
++        rows=api.query_orders(order_id=r['OrderDetail']['OrderID'])
++        if len(rows)!=1 or rows[0]['Status']!='FILLED':raise ApiError('Cleanup unconfirmed; no duplicate sell')
++        store.update_intent(k2,'done',{'OrderDetail':rows[0]})
++        store.event('probe_cleanup_fill',{'order':rows[0]})
++    end=api.balance_accounts()
++    orders=api.query_orders(pending_only=True)
++    shorts=api.short_positions()
++    if orders or shorts or any(sum(v.values()) for c,v in end['spot'].items() if c!='USD'):raise ApiError('Probe did not return to clean cash state')
++    report={'purpose':'authenticated_execution_classification_not_strategy_performance','buy_order':detail,'starting_usd':cash,'ending_usd':end['spot']['USD']['Free'],'cash_change':round(end['spot']['USD']['Free']-cash,2),'pending_orders':len(orders),'shorts':len(shorts),'inventory_zero':True}
++    Path('research/sigma_gate/passive_execution_test.json').write_text(json.dumps(report,indent=2))
++    store.event('probe_complete',report)
++    store.close();lock.close()
++
++
++if __name__=='__main__':main()
+diff --git a/research/probe_sigma_short.py b/research/probe_sigma_short.py
+new file mode 100644
+index 0000000..d87423c
+--- /dev/null
++++ b/research/probe_sigma_short.py
+@@ -0,0 +1,71 @@
++"""One autonomous $20 TEST-only short accounting check; immediately closes.
++
++No retry of a mutation. The durable journal remains available if reconciliation
++cannot establish ownership. This measures permissions/fees, not trading edge.
++"""
++import json
++from pathlib import Path
++import sys
++
++sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
++from sentinel.api import ApiError,AmbiguousWrite,Roostoo
++from sentinel.runner import InstanceLock
++from sentinel.state import Store
++
++
++def main():
++    api=Roostoo(spacing=2.2);api.sync_time()
++    lock=InstanceLock(Path('runtime')/'sigma_probe.lock')
++    store=Store('runtime/sigma_short_probe.sqlite3')
++    accounts=api.balance_accounts();wallet=accounts['spot']
++    resumed=bool(store.get('started'))
++    if not resumed and (not 49900<=wallet['USD']['Free']<=50100 or wallet['USD']['Lock'] or api.short_positions() or api.query_orders(pending_only=True) or any(sum(v.values()) for c,v in wallet.items() if c!='USD') or any(sum(v.values()) for v in accounts['margin'].values())):
++        raise ApiError('Requires clean supplied near-$50,000 TEST account')
++    start=store.get('initial_usd',wallet['USD']['Free']);now=api.now_ms()
++    if resumed:
++        row=store.db.execute("SELECT id,payload,response FROM intents ORDER BY created_ms LIMIT 1").fetchone()
++        if not row:raise ApiError('Started test lacks its intent; no mutation')
++        key,payload,opened=row[0],json.loads(row[1]),json.loads(row[2]) if row[2] else {}
++        now=payload['request_timestamp']
++    else:
++        store.set('initial_usd',start);store.set('started',True)
++        payload={'pair':'BTC/USD','collateral':'20.00','mode':'paper-exchange','side':'SHORT_OPEN','request_timestamp':now}
++        key=store.intent('one-bounded-short-permission-test',payload,now)
++    report={'purpose':'execution_classification_not_strategy_performance','starting_usd':start,'account_source':'supplied near-$50,000 TEST wallet'}
++    try:
++        if not resumed:
++            opened=api.short_open('BTC/USD','20.00')
++            store.update_intent(key,'acknowledged',opened)
++    except ApiError as e:
++        store.update_intent(key,'rejected',{'error':str(e)})
++        report.update(supported=False,error=str(e),mutations_accepted=0)
++        Path('research/sigma_gate/short_execution_test.json').write_text(json.dumps(report,indent=2))
++        store.event('short_probe_rejected',report);store.close();lock.close();return
++    except AmbiguousWrite:
++        store.update_intent(key,'unknown');opened={}
++    positions=api.short_positions()
++    matches=[s for s in positions if s['Pair']=='BTC/USD' and abs(int(s['CreateTimestamp'])-now)<60000 and (str(s['ID'])==str(opened.get('ID')) if opened else 0<float(s['Collateral'])<=20)]
++    if len(matches)!=1:raise ApiError('Short intent ambiguous; no resend or unverified close')
++    position=matches[0]
++    store.update_intent(key,'done',opened or position)
++    live_accounts=api.balance_accounts();quotes=api.ticker()
++    report.update(supported=True,open_response=opened,position=position,accounts_while_open=live_accounts,quote_while_open=quotes['Data']['BTC/USD'])
++    store.event('short_probe_open_verified',report)
++    k2=store.intent('one-bounded-short-cleanup',{'pair':'BTC/USD','side':'SHORT_CLOSE','position_id':position['ID']},api.now_ms())
++    if k2 is None:raise ApiError('Cleanup intent already exists; reconcile it without a repeated close')
++    try:
++        closed=api.short_close('BTC/USD')
++        store.update_intent(k2,'acknowledged',closed)
++    except AmbiguousWrite:
++        store.update_intent(k2,'unknown')
++        if api.short_positions():raise ApiError('Close status unknown; preserve journal, no resend') from None
++        closed={'reconciled_closed_position':True}
++    remaining=api.short_positions();pending=api.query_orders(pending_only=True);end=api.balance_accounts()
++    if remaining or pending or end['spot']['USD']['Lock'] or any(sum(v.values()) for v in end['margin'].values()):raise ApiError('Cleanup not verified')
++    store.update_intent(k2,'done',closed)
++    report.update(close_response=closed,ending_usd=end['spot']['USD']['Free'],cash_change=round(end['spot']['USD']['Free']-start,2),remaining_positions=0,pending_orders=0)
++    Path('research/sigma_gate/short_execution_test.json').write_text(json.dumps(report,indent=2))
++    store.event('short_probe_complete',report);store.close();lock.close()
++
++
++if __name__=='__main__':main()
+diff --git a/research/reproduce_sigma_origin.py b/research/reproduce_sigma_origin.py
+new file mode 100644
+index 0000000..5480299
+--- /dev/null
++++ b/research/reproduce_sigma_origin.py
+@@ -0,0 +1,34 @@
++"""Reproduce pinned unmodified v1.1 components on independently downloaded data."""
++import json
++from pathlib import Path
++import sys
++
++import pandas as pd
++
++sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
++from sentinel.data import read_bars
++from sentinel.sigma import PAIRS
++from sentinel.sigma_origin.strategy.core import StrategyParams,compute
++from sentinel.sigma_origin.portfolio.policy import PolicyParams
++from sentinel.sigma_origin.backtest.engine import ExecParams,run
++from sentinel.sigma_origin.metrics import summary
++
++
++if __name__=='__main__':
++    bars={p:read_bars('data/sigma',p) for p in PAIRS}
++    panels={k:pd.DataFrame({p:d[k].to_numpy() for p,d in bars.items()},index=pd.to_datetime(bars[PAIRS[0]].timestamp,unit='ms',utc=True)) for k in ['close','high','low','quote_volume']}
++    sp=StrategyParams(sleeves=('tgate',),prior_weights={'tgate':1},universe=PAIRS,min_daily_usd=1e6,gate_lookbacks=(168,336,720),gate_dead_band=.5)
++    pol=PolicyParams(mode='long_short',sizing='absolute',short_regime_max=2,short_scale=.5,max_weight=.3,max_weight_major=.4,band_abs=.03,band_rel=.2)
++    out=compute(panels['close'],panels['quote_volume'],sp,{p:2 if p!='XRP/USD' else 4 for p in PAIRS})
++    # Frozen reference bounds from the upstream checked-in NAV, not rolling now.
++    start=pd.Timestamp('2025-05-25T10:00:00Z')
++    end=pd.Timestamp('2026-10-02T09:00:00Z')
++    ticks=pd.Series({p:.01 if p!='XRP/USD' else .0001 for p in PAIRS})
++    hs=(ticks/panels['close'].median()*5000).clip(lower=.2)
++    r=run(out,panels['close'],panels['high'],panels['low'],pol,ExecParams(),start=start,end=end,half_spread_bps=hs)
++    s=summary(r.nav,fees_paid=r.fees,turnover=r.turnover,n_trades=len(r.trades))
++    s.update({'source':'independent_reference_simulation','start':str(start),'end_exclusive':str(end),'same_close_market_fills':True,'terminal_liquidation_fee_charged':False,'published_return':.20870052806691097,'maker_share':r.maker_ratio,'half_spread_proxy_bps':hs.to_dict()})
++    root=Path('research/sigma_gate/origin_reproduction');root.mkdir(parents=True,exist_ok=True)
++    r.nav.to_csv(root/'nav.csv');r.trades.to_csv(root/'trade_logs.csv',index=False)
++    (root/'summary.json').write_text(json.dumps(s,indent=2))
++    print(json.dumps(s,indent=2),flush=True)
+diff --git a/research/sigma_confidence.py b/research/sigma_confidence.py
+new file mode 100644
+index 0000000..fad0901
+--- /dev/null
++++ b/research/sigma_confidence.py
+@@ -0,0 +1,28 @@
++"""Paired moving-block confidence estimates; descriptive, not a forecast."""
++import json
++from pathlib import Path
++
++import numpy as np
++import pandas as pd
++
++root=Path('research/sigma_gate')
++paths={k:root/'comparisons'/k/'test_2026/all_taker/nav.csv' for k in ('sigma-reference-corrected','combined-conservative')}
++nav={k:pd.read_csv(p,index_col=0,parse_dates=True).iloc[:,0] for k,p in paths.items()}
++returns=pd.DataFrame({k:x.pct_change().dropna() for k,x in nav.items()}).dropna()
++n=len(returns);rng=np.random.default_rng(20261010)
++result={'source':'historical_simulation','method':'1000 paired moving-block resamples of frozen 2026 hourly net-return series; wrapping at sample end','selection_trials':9,'not_independent_of_upstream_research':True,'results':{}}
++for block in (48,168):
++    starts=rng.integers(0,n,size=(1000,int(np.ceil(n/block))))
++    indices=(starts[:,:,None]+np.arange(block)[None,None,:]).reshape(1000,-1)[:,:n]%n
++    sharpe={}
++    row={}
++    for k in returns:
++        sampled=returns[k].to_numpy()[indices]
++        sh=sampled.mean(axis=1)/sampled.std(axis=1,ddof=1)*np.sqrt(8760)
++        sharpe[k]=sh
++        row[k]={'sharpe_ci90':np.quantile(sh,[.05,.95]).tolist(),'bootstrap_fraction_sharpe_positive':float(np.mean(sh>0))}
++    delta=sharpe['combined-conservative']-sharpe['sigma-reference-corrected']
++    row['paired_sharpe_improvement_ci90']=np.quantile(delta,[.05,.95]).tolist()
++    result['results'][str(block)]=row
++(root/'confidence.json').write_text(json.dumps(result,indent=2))
++print(json.dumps(result,indent=2))
+diff --git a/research/sigma_gate/EXPERIMENT_PLAN.md b/research/sigma_gate/EXPERIMENT_PLAN.md
+new file mode 100644
+index 0000000..529989d
+--- /dev/null
++++ b/research/sigma_gate/EXPERIMENT_PLAN.md
+@@ -0,0 +1,45 @@
++# Plan recorded before new Sigma Gate results
++
++Pinned upstream: `64e0856d99791aab00c175687d1b354ae1490c8a`.
++The published v1.1 trend model and current v1.5 fixed-long model are distinct
++baselines. Their published returns will not be attributed to a new variant.
++
++Universe remains BTC, ETH, SOL, BNB and XRP. No instrument search. Hourly
++closed bars, checksum-verified monthly Binance archives from January 2022
++through September 2026, plus completed October days. USD/USDT basis and venue
++matching remain limitations. No invented historical Roostoo fills.
++
++Chronological development: 2022-03-01 to 2024-12-31.
++Validation: calendar 2025. Freeze a small shortlist using these periods, then
++test 2026 separately. The upstream team already studied much of 2025–2026;
++the copied hypothesis is not globally untouched out-of-sample. Recent
++October results are diagnostics and will not be used to tune parameters.
++
++Candidate changes, decided from mechanics rather than winning backtest rows:
++
++1. Hard gross/per-coin caps after applying no-trade bands; enforce cash,
++   collateral, quantity precision and exit costs in the research engine.
++2. Rebalance sizing every six hours while processing direction changes and
++   urgent risk reduction hourly. Test all six UTC phases, not a lucky hour.
++3. Volatility-shock sizing: use the larger of the 12-hour and 72-hour EWMA
++   volatility and a covariance exposure ceiling. Avoid instant risk increases
++   when stale volatility misses a jump.
++4. Direction-aware covariance sizing against the actual signed basket instead
++   of a hypothetical fully long basket; never add leverage to exploit netting.
++5. Strong-gate admission: hold cash for a split/weak trend ensemble; retain the
++   dead-band. This may reduce fee-consuming whipsaws at the cost of missed
++   trends.
++6. Cost-aware execution: compare passive trade-through fills with all-taker
++   costs and delayed next-open fills. Assume 0.05% maker only for simulated
++   nonmarketable fills; crossing LIMITs and shorts pay 0.10%.
++
++Use a small named ablation set, not a broad optimisation. Rank development
++and validation net performance, drawdown and turnover. Report every candidate
++including failures, double-cost stress, phase sensitivity, recent performance
++and independently reset 14-day episodes with liquidation charges.
++
++Live test scope: supplied near-$50,000 test wallet only; read-only account and
++order inspection plus bounded small execution classification when needed.
++No competition deployment, wash-trade activity farming or credits for shadow
++profits. Paper matching advantages are hypotheses until observed. Keep test
++evidence separate from strategy performance and competition account state.
+diff --git a/research/sigma_gate/selection_frozen.json b/research/sigma_gate/selection_frozen.json
+new file mode 100644
+index 0000000..1bd787e
+--- /dev/null
++++ b/research/sigma_gate/selection_frozen.json
+@@ -0,0 +1,118 @@
++{
++  "selection_inputs": "2022\u20132024 development and calendar 2025 validation only",
++  "ranking": [
++    {
++      "name": "combined-conservative",
++      "passes": true,
++      "score": 0.8105506593333499,
++      "worst_validation_return": 0.09539964019213998
++    },
++    {
++      "name": "sigma-reference-corrected",
++      "passes": true,
++      "score": 0.7638668421584455,
++      "worst_validation_return": 0.14949796437342977
++    },
++    {
++      "name": "strong-gate",
++      "passes": true,
++      "score": 0.6910048881745957,
++      "worst_validation_return": 0.1314400522203325
++    },
++    {
++      "name": "shorter-gates",
++      "passes": true,
++      "score": 0.6707284251307719,
++      "worst_validation_return": 0.13926338691956297
++    },
++    {
++      "name": "volatility-shock-guard",
++      "passes": true,
++      "score": 0.6220610650224551,
++      "worst_validation_return": 0.12307523931511177
++    },
++    {
++      "name": "six-hour-sizing",
++      "passes": true,
++      "score": 0.5523351968481323,
++      "worst_validation_return": 0.11541157111621292
++    },
++    {
++      "name": "signed-covariance",
++      "passes": true,
++      "score": 0.0948769608676358,
++      "worst_validation_return": 0.05112203791715908
++    },
++    {
++      "name": "combined-signed",
++      "passes": true,
++      "score": -0.05056714088251685,
++      "worst_validation_return": 0.011354408275556782
++    }
++  ],
++  "selected": {
++    "name": "combined-conservative",
++    "pairs": [
++      "BTC/USD",
++      "ETH/USD",
++      "SOL/USD",
++      "BNB/USD",
++      "XRP/USD"
++    ],
++    "gate_lookbacks": [
++      126,
++      252,
++      540
++    ],
++    "dead_band": 0.5,
++    "vol_halflife": 72,
++    "fast_vol_halflife": 12,
++    "warmup_hours": 720,
++    "min_daily_volume": 1000000,
++    "gate_min": 0.3,
++    "short_scale": 0.5,
++    "allow_shorts": true,
++    "target_vol": 0.2,
++    "gross_cap": 0.95,
++    "major_cap": 0.4,
++    "other_cap": 0.3,
++    "cov_window": 336,
++    "cov_shrink": 0.3,
++    "shock_guard": true,
++    "signed_covariance": false,
++    "sizing_hours": 6,
++    "sizing_phase": 0,
++    "dd_soft": 0.03,
++    "dd_hard": 0.1,
++    "dd_floor": 0.25,
++    "band_abs": 0.03,
++    "band_rel": 0.2,
++    "min_trade_usd": 50,
++    "maker_fee": 0.0005,
++    "taker_fee": 0.001,
++    "maker_patience_seconds": 3600,
++    "passive_through_bps": 2,
++    "slippage_bps": 1,
++    "max_order_fraction": 0.25,
++    "probe_total_usd": 100,
++    "daily_profit": 0.0035,
++    "total_profit": 0.011,
++    "daily_loss": 0.0075,
++    "total_loss": 0.025,
++    "max_drawdown": 0.025,
++    "max_consecutive_losses": 3,
++    "runtime_dir": "runtime",
++    "data_dir": "data/sigma",
++    "base_url": "https://mock-api.roostoo.com",
++    "data_base_url": "https://data-api.binance.vision",
++    "spacing": 2.2,
++    "poll_seconds": 30,
++    "competition_start": "2026-10-04T12:00:00Z",
++    "competition_end": "2026-10-18T00:00:00+08:00",
++    "fixed_long": 0,
++    "fixed_floor": -0.042,
++    "fixed_goal": 0.0025
++  },
++  "selected_hash": "26ee5f485f47231d7957797c80a86db6ff8b51981dd56449f18541cf8cd4fe84",
++  "profitability_proven": false
++}
+\ No newline at end of file
+diff --git a/sentinel/__main__.py b/sentinel/__main__.py
+index 994f713..fb6f1fb 100644
+--- a/sentinel/__main__.py
++++ b/sentinel/__main__.py
+@@ -51,9 +51,43 @@ def main():
+     status.add_argument("--mode", choices=["shadow", "paper-exchange"], default="paper-exchange")
+     status.add_argument("--remote", action="store_true", help="read balances/orders/quotes; never submit or cancel")
+     status.add_argument("--output", help="optional folder for summary.txt, trade_logs.csv and status.json")
++    sigma=sub.add_parser('sigma-run',help='Sigma Gate allocation; shadow by default, signed paper account only when requested')
++    sigma.add_argument('--sigma-config',default='sigma_config.json')
++    sigma.add_argument('--mode',choices=['shadow','paper-exchange'],default='shadow')
++    sigma.add_argument('--once',action='store_true')
++    sigma.add_argument('--max-minutes',type=float)
++    sigma.add_argument('--portfolio-cap-usd',type=float,help='total portfolio exposure cap; defaults to $100 testing cap')
++    sigma.add_argument('--passive',action='store_true',help='experimental maker-first execution; default all-taker matches the conservative tested case')
++    sigma_b=sub.add_parser('sigma-backtest',help='causal fee-aware historical Sigma simulation; no account writes')
++    sigma_b.add_argument('--sigma-config',default='sigma_config.json')
++    sigma_b.add_argument('--start',required=True)
++    sigma_b.add_argument('--end',required=True,help='exclusive UTC instant')
++    sigma_b.add_argument('--model',choices=['passive','all_taker','double_cost','delayed'],default='all_taker')
++    sigma_b.add_argument('--competition-stops',action='store_true')
++    sigma_b.add_argument('--output',default='research/sigma_custom_backtest')
++    sigma_status=sub.add_parser('sigma-status',help='read-only Sigma account and journal inspection')
++    sigma_status.add_argument('--sigma-config',default='sigma_config.json')
++    sigma_status.add_argument('--mode',choices=['shadow','paper-exchange'],default='paper-exchange')
++    sigma_status.add_argument('--remote',action='store_true')
+     args = ap.parse_args()
+-    c = None if args.command in {"tick-run","tick-status"} else Config.load(args.config)
+-    if args.command == "tick-run":
++    c = None if args.command in {"tick-run","tick-status","sigma-run","sigma-backtest","sigma-status"} else Config.load(args.config)
++    if args.command=='sigma-run':
++        from .sigma import SigmaConfig
++        from .sigma_live import SigmaRunner
++        if args.once and args.mode=='paper-exchange':ap.error('Signed trading uses a sustained or bounded session; --once is shadow only')
++        SigmaRunner(SigmaConfig.load(args.sigma_config),args.mode,args.max_minutes,args.portfolio_cap_usd,args.passive).run(args.once)
++    elif args.command=='sigma-backtest':
++        from .sigma import SigmaConfig,load_features
++        from .sigma_backtest import run,export
++        cfg=SigmaConfig.load(args.sigma_config)
++        result=run(load_features(cfg),cfg,args.start,args.end,args.model,competition_stops=args.competition_stops)
++        export(result,args.output)
++        print(json.dumps(result.summary,indent=2,allow_nan=False))
++    elif args.command=='sigma-status':
++        from .sigma import SigmaConfig
++        from .sigma_live import diagnose
++        print(json.dumps(diagnose(SigmaConfig.load(args.sigma_config),args.mode,args.remote),indent=2,allow_nan=False))
++    elif args.command == "tick-run":
+         from .tick import run_tick
+         run_tick(args.tick_config,args.mode,args.once,args.max_minutes,args.max_entries)
+     elif args.command == "tick-status":
+diff --git a/sentinel/api.py b/sentinel/api.py
+index 218a082..7e267e0 100644
+--- a/sentinel/api.py
++++ b/sentinel/api.py
+@@ -194,5 +194,11 @@ class Roostoo:
+         # 1x collateral sizing is defined by Roostoo. Never send quantity/side to this endpoint.
+         return self._request("POST", "/v6/short_open", {"pair": pair, "collateral": collateral}, signed=True, mutation=True)
+ 
+-    def short_close(self, pair: str):
+-        return self._request("POST", "/v6/short_close", {"pair": pair}, signed=True, mutation=True)
++    def short_close(self, pair: str, close_qty: str | None = None):
++        params = {"pair": pair}
++        if close_qty is not None:
++            value = Decimal(str(close_qty))
++            if not value.is_finite() or value <= 0:
++                raise ValueError("Invalid reduce-only short quantity")
++            params["close_qty"] = str(close_qty)
++        return self._request("POST", "/v6/short_close", params, signed=True, mutation=True)
+diff --git a/sentinel/data.py b/sentinel/data.py
+index d546b85..74c4874 100644
+--- a/sentinel/data.py
++++ b/sentinel/data.py
+@@ -76,7 +76,10 @@ def validate_frame(df: pd.DataFrame, contiguous: bool = False) -> None:
+ 
+ 
+ def read_bars(directory: str | Path, pair: str) -> pd.DataFrame:
+-    return normalize_frame(pd.read_csv(pair_path(directory, pair)))
++    path = pair_path(directory, pair)
++    if not path.exists():
++        path = path.with_suffix('.csv.gz')
++    return normalize_frame(pd.read_csv(path))
+ 
+ 
+ def save_bars(directory: str | Path, pair: str, df: pd.DataFrame) -> None:
+@@ -168,7 +171,7 @@ class LiveData:
+ 
+     def update(self, pair: str, now_ms: int, days: int = 190) -> pd.DataFrame:
+         path = pair_path(self.directory, pair)
+-        old = read_bars(self.directory, pair) if path.exists() else pd.DataFrame(columns=BAR_COLUMNS)
++        old = read_bars(self.directory, pair) if path.exists() or path.with_suffix('.csv.gz').exists() else pd.DataFrame(columns=BAR_COLUMNS)
+         start = int(old.timestamp.iloc[-1]) if len(old) else (now_ms // HOUR - days * 24) * HOUR
+         final_open = (now_ms // HOUR - 1) * HOUR
+         frames = [old] if len(old) else []
+diff --git a/sentinel/sigma.py b/sentinel/sigma.py
+new file mode 100644
+index 0000000..29732ce
+--- /dev/null
++++ b/sentinel/sigma.py
+@@ -0,0 +1,255 @@
++"""Causal Sigma Gate allocation, shared by research and the Roostoo adapter.
++
++The trend-gate function is credited to DhmalTPS (MIT); this adapter adds strict
++data validation, named risk/sizing ablations and post-band exposure ceilings.
++"""
++from __future__ import annotations
++
++from dataclasses import asdict, dataclass, fields, replace
++import hashlib
++import json
++from pathlib import Path
++
++import numpy as np
++import pandas as pd
++
++from .data import HOUR, read_bars, validate_frame
++from .sigma_origin.strategy.signals import ewm_vol, trend_gate_hysteresis
++
++PAIRS = ('BTC/USD', 'ETH/USD', 'SOL/USD', 'BNB/USD', 'XRP/USD')
++
++
++@dataclass(frozen=True)
++class SigmaConfig:
++    name: str = 'sigma-reference-corrected'
++    pairs: tuple[str, ...] = PAIRS
++    gate_lookbacks: tuple[int, ...] = (168, 336, 720)
++    dead_band: float = 0.5
++    vol_halflife: float = 72
++    fast_vol_halflife: float = 12
++    warmup_hours: int = 720
++    min_daily_volume: float = 1_000_000
++    gate_min: float = 0.30
++    short_scale: float = 0.5
++    allow_shorts: bool = True
++    target_vol: float = 0.30
++    gross_cap: float = 0.95
++    major_cap: float = 0.40
++    other_cap: float = 0.30
++    cov_window: int = 336
++    cov_shrink: float = 0.30
++    shock_guard: bool = False
++    signed_covariance: bool = False
++    sizing_hours: int = 1
++    sizing_phase: int = 0
++    dd_soft: float = 0.03
++    dd_hard: float = 0.10
++    dd_floor: float = 0.25
++    band_abs: float = 0.03
++    band_rel: float = 0.20
++    min_trade_usd: float = 50
++    maker_fee: float = 0.0005
++    taker_fee: float = 0.001
++    maker_patience_seconds: int = 3600
++    passive_through_bps: float = 2
++    slippage_bps: float = 1
++    max_order_fraction: float = 0.25
++    probe_total_usd: float = 100
++    daily_profit: float = 0.0035
++    total_profit: float = 0.011
++    daily_loss: float = 0.0075
++    total_loss: float = 0.025
++    max_drawdown: float = 0.025
++    max_consecutive_losses: int = 3
++    runtime_dir: str = 'runtime'
++    data_dir: str = 'data/sigma'
++    base_url: str = 'https://mock-api.roostoo.com'
++    data_base_url: str = 'https://data-api.binance.vision'
++    spacing: float = 2.2
++    poll_seconds: float = 30
++    competition_start: str = '2026-10-04T12:00:00Z'
++    competition_end: str = '2026-10-18T00:00:00+08:00'
++    fixed_long: float = 0
++    fixed_floor: float = -0.042
++    fixed_goal: float = 0.0025
++
++    def __post_init__(self):
++        if tuple(self.pairs) != PAIRS:
++            raise ValueError('Sigma universe is fixed; instrument selection is not a tuning parameter')
++        if not self.gate_lookbacks or any(type(x) is not int or x < 24 for x in self.gate_lookbacks):
++            raise ValueError('Invalid trend lookbacks')
++        for key, value in asdict(self).items():
++            if isinstance(value, (float, int)) and not isinstance(value, bool) and not np.isfinite(value):
++                raise ValueError(f'Nonfinite {key}')
++        if not 0 < self.gross_cap <= 0.95 or not 0 < self.major_cap <= 0.4 or not 0 < self.other_cap <= 0.3:
++            raise ValueError('Invalid exposure ceilings')
++        if not 0 < self.target_vol <= 0.5 or not 0 <= self.short_scale <= 1 or not 0 < self.gate_min <= 1:
++            raise ValueError('Invalid sizing parameters')
++        if not 0 <= self.dd_soft < self.dd_hard or not 0 <= self.dd_floor <= 1:
++            raise ValueError('Invalid drawdown governor')
++        if type(self.sizing_hours) is not int or self.sizing_hours < 1 or not 0 <= self.sizing_phase < self.sizing_hours:
++            raise ValueError('Invalid sizing schedule')
++        if self.probe_total_usd < 10 or self.min_trade_usd < 1 or self.spacing < 2 or self.poll_seconds < 15:
++            raise ValueError('Invalid execution budget')
++        if self.maker_fee < 0.0005 or self.taker_fee < 0.001 or not 0 <= self.fixed_long <= 0.95:
++            raise ValueError('Fees/exposure may not be understated')
++        if pd.Timestamp(self.competition_end) <= pd.Timestamp(self.competition_start):
++            raise ValueError('Invalid competition interval')
++
++    @classmethod
++    def load(cls, path='sigma_config.json'):
++        obj = json.loads(Path(path).read_text())
++        unknown = set(obj) - {f.name for f in fields(cls)}
++        if unknown:
++            raise ValueError(f'Unknown Sigma config fields: {sorted(unknown)}')
++        for k in ('pairs', 'gate_lookbacks'):
++            if k in obj:
++                obj[k] = tuple(obj[k])
++        return cls(**obj)
++
++    @property
++    def fingerprint(self):
++        return hashlib.sha256(json.dumps(asdict(self), sort_keys=True, separators=(',', ':')).encode()).hexdigest()
++
++
++@dataclass
++class SigmaFeatures:
++    index: pd.DatetimeIndex  # availability time: candle open + one hour
++    pairs: tuple
++    close: np.ndarray
++    open: np.ndarray
++    high: np.ndarray
++    low: np.ndarray
++    score: np.ndarray
++    slow_vol: np.ndarray
++    fast_vol: np.ndarray
++    covariance: np.ndarray
++    eligible: np.ndarray
++    gates: dict
++
++
++def prepare(bars: dict[str, pd.DataFrame], cfg: SigmaConfig) -> SigmaFeatures:
++    if set(bars) != set(cfg.pairs):
++        raise ValueError('Every fixed-universe asset needs complete history')
++    panels = {}
++    expected = None
++    for pair in cfg.pairs:
++        df = bars[pair].copy()
++        validate_frame(df)
++        times = df.timestamp.to_numpy(dtype=np.int64)
++        if expected is None:
++            expected = times
++        elif not np.array_equal(times, expected):
++            raise ValueError('Asset histories must align exactly; gaps cannot be forward-filled')
++        panels[pair] = df
++    breaks = np.flatnonzero(np.diff(expected) != HOUR)+1
++    if len(breaks):
++        bounds = [0, *breaks.tolist(), len(expected)]
++        segments = [prepare({p:panels[p].iloc[a:b].reset_index(drop=True) for p in cfg.pairs}, cfg) for a,b in zip(bounds[:-1], bounds[1:])]
++        index = segments[0].index.append([s.index for s in segments[1:]])
++        matrix = lambda key: np.concatenate([getattr(s,key) for s in segments], axis=0)
++        return SigmaFeatures(index,cfg.pairs,*[matrix(k) for k in ('close','open','high','low','score','slow_vol','fast_vol','covariance','eligible')],{k:np.concatenate([s.gates[k] for s in segments],axis=0) for k in segments[0].gates})
++    index = pd.to_datetime(expected+HOUR, unit='ms', utc=True)
++    close = pd.DataFrame({p: panels[p].close.to_numpy() for p in cfg.pairs}, index=index)
++    logp = np.log(close)
++    lr = logp.diff()
++    slow, fast = ewm_vol(lr, cfg.vol_halflife), ewm_vol(lr, cfg.fast_vol_halflife)
++    gate_parts = {}
++    for lb in cfg.gate_lookbacks:
++        z = (logp-logp.shift(lb))/(slow*np.sqrt(lb))
++        g = np.sign(z).where(z.abs() > cfg.dead_band).ffill().where(z.notna()).fillna(0)
++        gate_parts[str(lb)] = g.to_numpy()
++    score = trend_gate_hysteresis(logp, slow, cfg.gate_lookbacks, cfg.dead_band).to_numpy()
++    volume = pd.DataFrame({p: panels[p].quote_volume.to_numpy() for p in cfg.pairs}, index=index)
++    elig = (volume.rolling(336, min_periods=168).sum()/14 >= cfg.min_daily_volume).to_numpy()
++    elig[:max(cfg.warmup_hours, max(cfg.gate_lookbacks)), :] = False
++    returns = close.pct_change(fill_method=None)
++    cov = returns.rolling(cfg.cov_window, min_periods=48).cov().to_numpy().reshape(len(index), len(cfg.pairs), len(cfg.pairs))
++    sd = np.sqrt(np.clip(np.diagonal(cov, axis1=1, axis2=2), 1e-12, None))
++    corr = cov/(sd[:, :, None]*sd[:, None, :])
++    n = len(cfg.pairs)
++    rho = (corr.sum(axis=(1, 2))-n)/(n*(n-1))
++    target = np.broadcast_to(rho[:, None, None], corr.shape).copy()
++    target[:, np.arange(n), np.arange(n)] = 1
++    cov = ((1-cfg.cov_shrink)*corr+cfg.cov_shrink*target)*sd[:, :, None]*sd[:, None, :]*8760
++    values = lambda key: np.column_stack([panels[p][key].to_numpy() for p in cfg.pairs])
++    return SigmaFeatures(index, cfg.pairs, close.to_numpy(), values('open'), values('high'), values('low'), score, slow.to_numpy(), fast.to_numpy(), cov, elig, gate_parts)
++
++
++def load_features(cfg: SigmaConfig):
++    return prepare({p: read_bars(cfg.data_dir, p) for p in cfg.pairs}, cfg)
++
++
++def apply_caps(weights, cfg):
++    caps = np.array([cfg.major_cap if p in {'BTC/USD', 'ETH/USD'} else cfg.other_cap for p in cfg.pairs])
++    w = np.clip(np.asarray(weights, dtype=float), -caps, caps)
++    gross = np.abs(w).sum()
++    if gross > cfg.gross_cap:
++        w *= cfg.gross_cap/gross
++    return w
++
++
++def target_weights(f: SigmaFeatures, i: int, current, nav: float, state: dict, cfg: SigmaConfig):
++    """One closed-hour decision. State is serializable and never reset hourly."""
++    current = np.asarray(current, float)
++    if nav <= 0 or not np.isfinite(nav) or not np.isfinite(current).all():
++        raise ValueError('Invalid portfolio state')
++    hist = state.setdefault('nav_history', [])
++    hist.append(float(nav))
++    del hist[:-336]
++    peak = max(hist)
++    dd = max(0, 1-nav/peak)
++    mult = 1 if dd <= cfg.dd_soft else cfg.dd_floor if dd >= cfg.dd_hard else 1-(dd-cfg.dd_soft)/(cfg.dd_hard-cfg.dd_soft)*(1-cfg.dd_floor)
++    sigma = np.maximum(f.slow_vol[i], f.fast_vol[i]) if cfg.shock_guard else f.slow_vol[i]
++    eligible = f.eligible[i] & np.isfinite(sigma) & (sigma > 0)
++    inv = np.where(eligible, 1/np.maximum(sigma, 1e-12), 0)
++    base = inv/inv.sum() if inv.sum() else np.zeros_like(inv)
++    score = np.where(eligible & (np.abs(f.score[i])+1e-10 >= cfg.gate_min), f.score[i], 0)
++    if not cfg.allow_shorts:
++        score = np.maximum(score, 0)
++    raw = score*base
++    raw[raw < 0] *= cfg.short_scale
++    risk_basket = raw if cfg.signed_covariance else base
++    cov = f.covariance[i]
++    port_vol = float(np.sqrt(max(0, risk_basket@cov@risk_basket))) if np.isfinite(cov).all() else float('nan')
++    scale = min(1, cfg.target_vol/max(port_vol, 1e-12)) if np.isfinite(port_vol) else 0
++    raw *= scale
++    if cfg.fixed_long:
++        initial = state.setdefault('initial_nav', float(nav))
++        ret = nav/initial-1
++        lock = state.get('fixed_lock', '')
++        if not lock and (ret <= cfg.fixed_floor or ret >= cfg.fixed_goal):
++            lock = 'floor' if ret <= cfg.fixed_floor else 'goal'
++            state['fixed_lock'] = lock
++        raw = np.zeros_like(base) if lock else base*cfg.fixed_long
++    raw = apply_caps(raw*mult, cfg)
++    changed_side = np.sign(raw) != np.sign(current)
++    scheduled = int(f.index[i].timestamp()//3600) % cfg.sizing_hours == cfg.sizing_phase
++    threshold = np.maximum(cfg.band_abs, cfg.band_rel*np.abs(raw))
++    material = (np.abs(raw-current) > threshold) | changed_side
++    material &= (np.abs(raw-current)*nav >= cfg.min_trade_usd) | (raw == 0)
++    urgent_reduce = (np.abs(raw) < np.abs(current)) & ((mult < state.get('last_dd_multiplier', 1)) | (cfg.shock_guard & (f.fast_vol[i] > f.slow_vol[i]*1.5)))
++    if not scheduled:
++        material &= changed_side | urgent_reduce
++    if state.get('fixed_lock'):
++        material[:] = True
++    result = apply_caps(np.where(material, raw, current), cfg)
++    state['last_dd_multiplier'] = float(mult)
++    state['gates'] = {k: np.asarray(v[i]).tolist() for k, v in f.gates.items()}
++    return result, {'score': f.score[i].tolist(), 'gross': float(np.abs(result).sum()), 'net': float(result.sum()), 'drawdown_multiplier': float(mult), 'sizing_scheduled': bool(scheduled), 'annual_basket_vol': port_vol if np.isfinite(port_vol) else None}
++
++
++def candidates():
++    base = SigmaConfig()
++    fast = replace(base, name='shorter-gates', gate_lookbacks=(126, 252, 540))
++    return [
++        base,
++        fast,
++        replace(fast, name='six-hour-sizing', sizing_hours=6),
++        replace(fast, name='volatility-shock-guard', shock_guard=True),
++        replace(fast, name='signed-covariance', signed_covariance=True),
++        replace(fast, name='strong-gate', gate_min=2/3),
++        replace(fast, name='combined-conservative', sizing_hours=6, shock_guard=True, target_vol=0.20),
++        replace(fast, name='combined-signed', sizing_hours=6, shock_guard=True, signed_covariance=True, target_vol=0.20),
++        replace(fast, name='current-upstream-fixed-long', fixed_long=0.90, dd_soft=0.06, dd_hard=0.15),
++    ]
+diff --git a/sentinel/sigma_backtest.py b/sentinel/sigma_backtest.py
+new file mode 100644
+index 0000000..338353c
+--- /dev/null
++++ b/sentinel/sigma_backtest.py
+@@ -0,0 +1,219 @@
++"""Event-driven Sigma research. Historical fills are simulated, never API fills.
++
++Orders decided after bar t closes execute no earlier than the next bar. There
++is no same-close fill, invented queue advantage, rebate or zero-fee rounding
++credit. Short proceeds are not spendable: twice their basis is reserved in the
++signed-cash representation, equivalent to one-times collateral accounting.
++"""
++from __future__ import annotations
++
++from dataclasses import dataclass
++import math
++from pathlib import Path
++
++import numpy as np
++import pandas as pd
++
++from .sigma import SigmaConfig, SigmaFeatures, target_weights
++
++
++@dataclass
++class SigmaResult:
++    nav: pd.Series
++    trades: pd.DataFrame
++    diagnostics: pd.DataFrame
++    summary: dict
++
++
++def metrics(nav, initial=100000., fees=0, turnover=0, maker_notional=0, trades=0):
++    x = np.asarray(nav, float)
++    r = np.diff(x)/x[:-1]
++    vol = float(r.std(ddof=1)) if len(r)>1 else 0
++    downside = float(np.sqrt(np.mean(np.minimum(r, 0)**2))) if len(r) else 0
++    return {'return': float(x[-1]/initial-1), 'sharpe': float(r.mean()/vol*np.sqrt(8760)) if vol else 0,
++            'sortino': float(r.mean()/downside*np.sqrt(8760)) if downside else 0,
++            'max_drawdown': float(np.max(1-x/np.maximum.accumulate(x))), 'fees_usd': float(fees),
++            'turnover_nav': float(turnover/initial), 'maker_share': float(maker_notional/turnover) if turnover else 0,
++            'trades': int(trades), 'hours': len(x)-1}
++
++
++def run(f: SigmaFeatures, cfg: SigmaConfig, start, end, model='passive', initial=100000., competition_stops=False):
++    if model not in {'passive', 'all_taker', 'double_cost', 'delayed'}:
++        raise ValueError('Unknown execution model')
++    ix = np.flatnonzero((f.index>=pd.Timestamp(start)) & (f.index<pd.Timestamp(end)))
++    if len(ix)<2:
++        raise ValueError('Insufficient evaluation interval')
++    n=len(f.pairs)
++    qty=np.zeros(n)
++    basis=np.zeros(n)
++    cash=float(initial)
++    state={}
++    pending={}
++    market=[]
++    rows=[]
++    navrows=[(f.index[ix[0]]-pd.Timedelta(hours=1), cash)]
++    diags=[]
++    fees=turnover=maker_notional=0.
++    scale_cost=2 if model=='double_cost' else 1
++    slip=(5 if model=='delayed' else cfg.slippage_bps*scale_cost)/10000
++    half_spread=np.array([0.005/85000, 0.005/2700, 0.005/120, 0.005/750, 0.00005/1.5])
++    step=np.array([1e-5,1e-4,1e-3,1e-3,1e-1])
++    price_tick=np.array([.01,.01,.01,.01,.0001])
++    peak=float(initial)
++    day=''
++    day_start=float(initial)
++    permanent=''
++    daily=''
++    daily_losses=0
++    pair_realized=np.zeros(n)
++    halts=[]
++
++    def short_basis():
++        return float(np.sum(np.where(qty<0,-qty*basis,0)))
++
++    def liquidation(px):
++        return cash+float(qty@px)-float((np.abs(qty)*px*(cfg.taker_fee*scale_cost+half_spread+slip)).sum())
++
++    def fill(j, dq, px, role, t, reason):
++        nonlocal cash,fees,turnover,maker_notional,daily_losses
++        if abs(dq)<step[j]/2:
++            return
++        # A single fill cannot flip sign. Plan the reducing leg first.
++        q0=qty[j]
++        if q0*dq<0:
++            dq=math.copysign(min(abs(dq),abs(q0)),dq)
++        opening=q0==0 or q0*dq>0
++        fee_rate=(cfg.maker_fee if role=='MAKER' else cfg.taker_fee)*scale_cost
++        if opening:
++            free=cash-2*short_basis()
++            affordable=max(0,free)/(px*(1+fee_rate))
++            mark=f.open[i] if reason!='terminal_liquidation' else f.close[i]
++            eq=liquidation(mark)
++            gross=float((np.abs(qty)*mark).sum())
++            cap=cfg.major_cap if f.pairs[j] in {'BTC/USD','ETH/USD'} else cfg.other_cap
++            budget=max(0,min(cfg.gross_cap*eq-gross,cap*eq-abs(qty[j])*mark[j]))
++            exposure_allowance=budget/(px*(1+fee_rate+2*slip+2*half_spread[j]))
++            dq=math.copysign(min(abs(dq),affordable,exposure_allowance),dq)
++        dq=math.copysign(np.floor((abs(dq)+1e-10)/step[j])*step[j],dq)
++        if abs(dq)<step[j]/2:
++            return
++        amount=abs(dq)*px
++        fee=amount*fee_rate
++        cash-=dq*px+fee
++        if opening:
++            basis[j]=(abs(q0)*basis[j]+abs(dq)*px)/(abs(q0)+abs(dq))
++            pair_realized[j]-=fee
++        else:
++            realized=abs(dq)*np.sign(q0)*(px-basis[j])-fee
++            pair_realized[j]+=realized
++        qty[j]+=dq
++        if abs(qty[j])<step[j]/2:
++            qty[j]=basis[j]=0
++            daily_losses=daily_losses+1 if pair_realized[j]<0 else 0
++            pair_realized[j]=0
++        fees+=fee
++        turnover+=amount
++        maker_notional+=amount if role=='MAKER' else 0
++        rows.append({'timestamp':t.isoformat(),'pair':f.pairs[j],'quantity_delta':float(dq),'price':float(px),'role':role,'fee_usd':float(fee),'reason':reason,'source':'historical_simulation','model':model})
++
++    for k,i in enumerate(ix):
++        t=f.index[i]
++        if i>0 and f.index[i]-f.index[i-1]!=pd.Timedelta(hours=1):
++            # No model fills in an unobserved hour. Cancel stale plans and
++            # reduce known inventory at the first observable opening quote.
++            pending={}
++            market=[(j,-qty[j],'data_gap_reduction') for j in range(n) if qty[j]!=0]
++        half_spread=price_tick/(2*f.open[i])
++        hktday=t.tz_convert('Asia/Hong_Kong').date().isoformat()
++        if hktday!=day:
++            day=hktday
++            day_start=liquidation(f.open[i])
++            daily=''
++            daily_losses=0
++        # Market orders were planned at the preceding close.
++        queued=market
++        market=[]
++        for j,dq,reason in sorted(queued,key=lambda o:0 if qty[o[0]]*o[1]<0 else 1):
++            q0=qty[j]
++            signed=1 if dq>0 else -1
++            px=f.open[i,j]*(1+signed*(half_spread[j]+slip))
++            fill(j,dq,px,'TAKER',t-pd.Timedelta(hours=1),reason)
++        # Passive orders must cross through an executable-side proxy, not touch.
++        for j,o in list(pending.items()):
++            through=o['limit']*(1-o['side']*cfg.passive_through_bps/10000)
++            hit=f.low[i,j]<=through if o['side']>0 else f.high[i,j]>=through
++            if hit:
++                fill(j,o['dq'],o['limit'],'MAKER',t,'trade_through_proxy')
++                del pending[j]
++            else:
++                o['age']+=1
++        px=f.close[i]
++        nav=liquidation(px)
++        peak=max(peak,nav)
++        reason=''
++        if competition_stops:
++            if nav<=initial*(1-cfg.total_loss):permanent=permanent or 'total_loss'
++            if nav<=peak*(1-cfg.max_drawdown):permanent=permanent or 'max_drawdown'
++            if nav>=initial*(1+cfg.total_profit):permanent=permanent or 'total_profit'
++            if nav<=day_start*(1-cfg.daily_loss):daily=daily or 'daily_loss'
++            if nav>=day_start*(1+cfg.daily_profit):daily=daily or 'daily_profit'
++            if daily_losses>=cfg.max_consecutive_losses:daily=daily or 'consecutive_losses'
++            reason=permanent or daily
++        current=qty*px/max(nav,1e-9)
++        w,d=target_weights(f,i,current,nav,state,cfg)
++        if reason:
++            w[:]=0
++            if not halts or halts[-1]['reason']!=reason or halts[-1]['day']!=day:
++                halts.append({'timestamp':t.isoformat(),'reason':reason,'day':day})
++        # Reconcile target at each close; cancel stale opposite/budgeted limits.
++        new_pending={}
++        for j in range(n):
++            target=w[j]*nav/px[j]
++            q0=qty[j]
++            if target*q0<0:
++                dq=-q0
++                reducing=True
++            else:
++                dq=target-q0
++                reducing=q0*dq<0
++            amount=abs(dq)*px[j]
++            if amount<cfg.min_trade_usd and not (target==0 and q0!=0):
++                continue
++            dq=math.copysign(min(abs(dq),cfg.max_order_fraction*nav/px[j]),dq)
++            if abs(dq)<step[j]/2:continue
++            o=pending.get(j)
++            risk_exit=bool(reason or target==0 or target*q0<0)
++            short_leg=q0<0 or target<0
++            fallback=o is not None and o['age']>=max(1,cfg.maker_patience_seconds//3600)
++            if model!='passive' or risk_exit or short_leg or fallback:
++                market.append((j,dq,'risk_exit' if risk_exit else 'short' if short_leg else 'passive_timeout' if fallback else 'next_open'))
++            else:
++                side=1 if dq>0 else -1
++                limit=px[j]*(1-side*half_spread[j])
++                limit=np.floor(limit/price_tick[j])*price_tick[j] if side>0 else np.ceil(limit/price_tick[j])*price_tick[j]
++                new_pending[j]={'dq':dq,'limit':limit,'side':side,'age':0 if o is None else o['age']}
++        pending=new_pending
++        navrows.append((t,nav))
++        diags.append({'timestamp':t,'gross':float(np.abs(current).sum()),'cash_free_proxy':float(cash-2*short_basis()),'halt':reason,**d})
++    # Explicit terminal liquidation prevents uncharged exit costs inflating return.
++    i=ix[-1]
++    for j in range(n):
++        if qty[j]!=0:
++            dq=-qty[j]
++            side=1 if dq>0 else -1
++            fill(j,dq,f.close[i,j]*(1+side*(half_spread[j]+slip)),'TAKER',f.index[i],'terminal_liquidation')
++    navrows[-1]=(f.index[i],cash)
++    nav=pd.Series([v for _,v in navrows],index=pd.DatetimeIndex([t for t,_ in navrows]),name='net_liquidation_equity')
++    summary=metrics(nav,initial,fees,turnover,maker_notional,len(rows))
++    summary.update({'model':model,'config_hash':cfg.fingerprint,'competition_stops':competition_stops,'halt_events':halts,'initial_usd':initial,'start':str(nav.index[0]),'end':str(nav.index[-1]),'source':'historical_simulation','hourly_stop_resolution':True})
++    return SigmaResult(nav,pd.DataFrame(rows),pd.DataFrame(diags),summary)
++
++
++def export(result: SigmaResult, directory):
++    import json
++    root=Path(directory)
++    root.mkdir(parents=True,exist_ok=True)
++    result.nav.to_csv(root/'nav.csv')
++    result.trades.to_csv(root/'trade_logs.csv',index=False)
++    result.diagnostics.to_csv(root/'decisions.csv',index=False)
++    (root/'summary.json').write_text(json.dumps(result.summary,indent=2,allow_nan=False))
+diff --git a/sentinel/sigma_live.py b/sentinel/sigma_live.py
+new file mode 100644
+index 0000000..60c4f67
+--- /dev/null
++++ b/sentinel/sigma_live.py
+@@ -0,0 +1,417 @@
++"""Durable, bounded Roostoo adapter for the Sigma allocation.
++
++Shadow is the default. Paper-exchange mode uses real signed mock API orders.
++One unresolved write pauses all other writes; only journaled orders may be
++canceled. Targets use closed hourly bars; risk is checked every polling cycle.
++"""
++from __future__ import annotations
++
++from concurrent.futures import ThreadPoolExecutor
++from dataclasses import replace
++from decimal import Decimal,ROUND_UP
++import json
++import math
++from pathlib import Path
++import signal
++import time
++
++import numpy as np
++import pandas as pd
++
++from .account import bind_account
++from .api import ApiError,AmbiguousWrite,Roostoo,decimal_string
++from .data import HOUR,LiveData
++from .runner import InstanceLock,code_version
++from .sigma import SigmaConfig,prepare,target_weights,apply_caps
++from .state import Store
++
++
++def normalize_order(detail, before_coin, current_coin):
++    """Reject impossible fills; recognize the observed zero-execution echo."""
++    row=dict(detail)
++    requested=float(row['Quantity'])
++    filled=float(row.get('FilledQuantity',0))
++    avg=float(row.get('FilledAverPrice',0))
++    fee=float(row.get('CommissionChargeValue',0))
++    zeros=all(k in row and float(row[k])==0 for k in ('CoinChange','UnitChange','CommissionChargeValue','FilledAverPrice'))
++    if filled and avg==0 and zeros and abs(filled-requested)<1e-10 and abs(current_coin-before_coin)<1e-10:
++        row['FilledQuantity']=filled=0.
++    if not all(math.isfinite(v) for v in (requested,filled,avg,fee)) or not 0<=filled<=requested+1e-8 or (filled and avg<=0):
++        raise ApiError('Impossible exchange fill; writes paused')
++    return row
++
++
++def account_snapshot(accounts,shorts,ticker,cfg):
++    spot=accounts['spot'];margin=accounts['margin']
++    if any(sum(v.values()) for v in margin.values()):
++        raise ApiError('Funded MarginWallet accounting needs separate verification; new writes paused')
++    usd=spot['USD'];nav=usd['Free']+usd['Lock']
++    values=np.zeros(len(cfg.pairs));quantities=np.zeros(len(cfg.pairs))
++    collateral=sum(float(s['Collateral']) for s in shorts)
++    if collateral>usd['Lock']+.04:
++        raise ApiError('Collateral is not represented in SpotWallet USD Lock; accounting unverified')
++    for j,pair in enumerate(cfg.pairs):
++        q=ticker['Data'][pair]
++        bid,ask=float(q['MaxBid']),float(q['MinAsk'])
++        if not 0<bid<=ask or not math.isfinite(bid+ask):raise ApiError('Invalid executable quote')
++        coin=spot.get(pair.split('/')[0],{'Free':0,'Lock':0})
++        long=float(coin['Free'])+float(coin['Lock'])
++        short=next((s for s in shorts if s['Pair']==pair),None)
++        if long and short:raise ApiError('Simultaneous long and short on one pair is outside this strategy')
++        qty=long if not short else -float(short['ShortQty'])
++        quantities[j]=qty;values[j]=qty*(bid if qty>=0 else ask)
++        nav+=long*bid*(1-cfg.taker_fee)
++        if short:
++            pnl=max(-float(short['Collateral']),float(short['ShortQty'])*(float(short['EntryPrice'])-ask))
++            nav+=pnl-float(short['ShortQty'])*ask*cfg.taker_fee
++    for c,v in spot.items():
++        if c!='USD' and c+'/USD' not in cfg.pairs and sum(v.values()):raise ApiError('Unmanaged asset outside fixed universe')
++    if not math.isfinite(nav) or nav<=0:raise ApiError('Invalid account equity')
++    return float(nav),float(usd['Free']),quantities,values
++
++
++def risk_reason(nav,now,risk,cfg):
++    day=pd.Timestamp(now,unit='ms',tz='UTC').tz_convert('Asia/Hong_Kong').date().isoformat()
++    if risk.get('day')!=day:
++        risk.update(day=day,day_start=nav,daily_halt='',consecutive_losses=0)
++    risk.setdefault('initial',nav);risk.setdefault('peak',nav);risk.setdefault('permanent_halt','')
++    risk['peak']=max(risk['peak'],nav)
++    permanent=''
++    if nav<=risk['initial']*(1-cfg.total_loss):permanent='total_loss'
++    elif nav<=risk['peak']*(1-cfg.max_drawdown):permanent='max_drawdown'
++    elif nav>=risk['initial']*(1+cfg.total_profit):permanent='total_profit'
++    risk['permanent_halt']=risk['permanent_halt'] or permanent
++    daily=''
++    if nav<=risk['day_start']*(1-cfg.daily_loss):daily='daily_loss'
++    elif nav>=risk['day_start']*(1+cfg.daily_profit):daily='daily_profit'
++    elif risk.get('consecutive_losses',0)>=cfg.max_consecutive_losses:daily='consecutive_losses'
++    risk['daily_halt']=risk.get('daily_halt','') or daily
++    return risk['permanent_halt'] or risk['daily_halt']
++
++
++class SigmaRunner:
++    def __init__(self,cfg,mode='shadow',max_minutes=None,portfolio_cap=None,prefer_passive=False):
++        if mode not in {'shadow','paper-exchange'}:raise ValueError('Unknown Sigma mode')
++        if max_minutes is not None and not 0<max_minutes<=1440:raise ValueError('Invalid bounded duration')
++        self.cfg,self.mode=cfg,mode
++        self.prefer_passive=bool(prefer_passive)
++        self.cap=cfg.probe_total_usd if portfolio_cap is None else float(portfolio_cap)
++        if not math.isfinite(self.cap) or self.cap<10:raise ValueError('Invalid total portfolio cap')
++        self.lock=InstanceLock(Path(cfg.runtime_dir)/'bot.lock')
++        self.store=Store(Path(cfg.runtime_dir)/('sigma_'+mode.replace('-','_')+'.sqlite3'))
++        self.api=Roostoo(cfg.base_url,cfg.spacing)
++        self.api.sync_time()
++        if mode=='paper-exchange':bind_account(self.api,self.store)
++        self.meta=self.api.exchange_info()['TradePairs']
++        for p in cfg.pairs:
++            if self.meta.get(p,{}).get('CanTrade') is not True:raise ApiError('Fixed-universe pair unavailable')
++        self.version=code_version()
++        self.feed=LiveData(cfg.data_base_url,cfg.data_dir,cfg.spacing)
++        self.pool=ThreadPoolExecutor(max_workers=1)
++        self.future=None;self.features=None;self.feed_hour=None
++        self.policy=self.store.get('sigma_policy',{})
++        self.risk=self.store.get('sigma_risk',{})
++        self.owned=self.store.get('sigma_owned',[0.]*len(cfg.pairs))
++        self.targets=self.store.get('sigma_targets',[0.]*len(cfg.pairs))
++        self.last_hour=self.store.get('sigma_last_hour')
++        self.stop_requested=False
++        self.last_report=0.
++        session=self.store.get('sigma_session',{})
++        if session.get('complete'):
++            session={}
++        if max_minutes is not None and not session:
++            session={'deadline_ms':self.api.now_ms()+int(max_minutes*60000),'stopping':False,'complete':False}
++        self.session=session
++        self.store.set('sigma_session',session)
++        self.store.event('sigma_start',{'mode':mode,'config_hash':cfg.fingerprint,'commit':self.version,'portfolio_cap_usd':self.cap,'deadline_ms':session.get('deadline_ms'),'prefer_passive':self.prefer_passive})
++
++    def refresh(self,now):
++        hour=now//HOUR
++        if self.future is not None and self.future.done():
++            try:
++                self.features=self.future.result()
++            except Exception as e:
++                self.features=None;self.feed_hour=None
++                self.store.event('sigma_data_pause',{'error':f'{type(e).__name__}: {e}'})
++            self.future=None
++        if self.future is None and self.feed_hour!=hour:
++            self.feed_hour=hour
++            def update():
++                return prepare({p:self.feed.update(p,now,65) for p in self.cfg.pairs},self.cfg)
++            self.future=self.pool.submit(update)
++
++    def snapshot(self,ticker,check_orders=True):
++        if self.mode=='shadow':
++            return 100000.,100000.,np.zeros(len(self.cfg.pairs)),np.zeros(len(self.cfg.pairs)),{},[]
++        accounts=self.api.balance_accounts();shorts=self.api.short_positions()
++        nav,free,qty,values=account_snapshot(accounts,shorts,ticker,self.cfg)
++        if check_orders:
++            pending=self.api.query_orders(pending_only=True)
++            known={str((r['response'] or {}).get('OrderDetail',{}).get('OrderID')) for r in self.store.unfinished()}
++            if any(str(o['OrderID']) not in known for o in pending):raise ApiError('Unmanaged pending order; preserve previous bot/ledger')
++        return nav,free,qty,values,accounts['spot'],shorts
++
++    def reconcile(self,ticker):
++        if self.mode=='shadow':return True
++        for intent in self.store.unfinished():
++            p=intent['payload'];r=intent['response'] or {};j=self.cfg.pairs.index(p['pair'])
++            wallet=self.api.balance();shorts=self.api.short_positions()
++            spot=wallet.get(p['pair'].split('/')[0],{'Free':0,'Lock':0})
++            actual_long=spot['Free']+spot['Lock']
++            actual_short=next((s for s in shorts if s['Pair']==p['pair']),None)
++            actual=-float(actual_short['ShortQty']) if actual_short else actual_long
++            if p['side'] in {'SHORT_OPEN','SHORT_CLOSE'}:
++                if not r:
++                    # A uniquely changed, owned short quantity reconciles a lost
++                    # response; an unchanged book cannot prove rejection.
++                    changed=actual-p['before_qty']
++                    expected=-float(p['quantity']) if p['side']=='SHORT_OPEN' else float(p['quantity'])
++                    if abs(changed-expected)>2*10**-int(self.meta[p['pair']]['AmountPrecision']):
++                        raise ApiError('Ambiguous short write; no resubmission')
++                    self.risk['permanent_halt']='short_execution_fee_unverified'
++                    self.store.set('sigma_risk',self.risk)
++                elif p['side']=='SHORT_OPEN' and r.get('Status')!='OPEN':raise ApiError('Short open was not confirmed')
++                elif p['side']=='SHORT_CLOSE' and 'ClosedQty' not in r:raise ApiError('Short close was not confirmed')
++                if r:
++                    observed_fee=float(r.get('OpenFee',0) if p['side']=='SHORT_OPEN' else r.get('CloseFee',0))
++                    price=float(r.get('EntryPrice',0) if p['side']=='SHORT_OPEN' else r.get('ClosePrice',0))
++                    if price<=0 or observed_fee>abs(actual-p['before_qty'])*price*self.cfg.taker_fee+.02:
++                        self.risk['permanent_halt']='unexpected_short_fee';self.store.set('sigma_risk',self.risk)
++                self.owned[j]=actual
++                fill={'pair':p['pair'],'side':p['side'],'quantity':abs(actual-p['before_qty']),'response':r,'mode':self.mode,'purpose':p['reason']}
++                self._finish(intent,fill,actual)
++                continue
++            oid=r.get('OrderDetail',{}).get('OrderID')
++            if oid is None:
++                matches=self.api.query_orders(limit=100)
++                matches=[o for o in matches if o.get('Pair')==p['pair'] and o.get('Side')==p['side'] and o.get('Type')==p['type'] and abs(int(o.get('CreateTimestamp',0))-p['request_timestamp'])<60000 and abs(float(o.get('Quantity',0))-float(p['quantity']))<10**-int(self.meta[p['pair']]['AmountPrecision']) and (p['type']=='MARKET' or abs(float(o.get('Price',0))-float(p['price']))<10**-int(self.meta[p['pair']]['PricePrecision']))]
++                if len(matches)!=1:raise ApiError('Ambiguous spot write; no resubmission')
++                r={'OrderDetail':matches[0]};oid=matches[0]['OrderID']
++                self.store.update_intent(intent['id'],'acknowledged',r)
++            rows=self.api.query_orders(order_id=oid)
++            if len(rows)!=1:raise ApiError('Owned order missing')
++            detail=normalize_order(rows[0],p['before_qty'],actual_long)
++            filled=float(detail['FilledQuantity'])
++            expected=p['before_qty']+(1 if p['side']=='BUY' else -1)*filled
++            if abs(expected-actual)>max(2*10**-int(self.meta[p['pair']]['AmountPrecision']),filled*.0011):
++                raise ApiError('Order and wallet holdings disagree; new writes paused')
++            self.owned[j]=actual
++            self.store.set('sigma_owned',self.owned)
++            if detail['Status'] in {'PENDING','PARTIALLY_FILLED'}:
++                expired=self.api.now_ms()-p['request_timestamp']>=self.cfg.maker_patience_seconds*1000
++                sign_changed=np.sign(self.targets[j])*np.sign(float(p['quantity'])*(1 if p['side']=='BUY' else -1))<0
++                if expired or self.session.get('stopping') or self.stop_requested or self.risk.get('permanent_halt') or self.risk.get('daily_halt') or sign_changed:
++                    try:self.api.cancel_order(oid)
++                    except (AmbiguousWrite,ApiError):pass
++                    self.store.set('sigma_fallback_'+p['pair'],bool(expired))
++                    self.store.event('sigma_cancel_requested',{'owned_order_id':oid,'reason':'expired_or_risk_reduction'})
++                return False
++            if detail['Status'] not in {'FILLED','CANCELED','CANCELLED','REJECTED'}:raise ApiError('Unexpected order state')
++            if filled and abs(float(detail.get('CommissionPercent',self.cfg.taker_fee)))>self.cfg.taker_fee+1e-8:
++                self.risk['permanent_halt']='unexpected_fee';self.store.set('sigma_risk',self.risk)
++            self._finish(intent,{'pair':p['pair'],'side':p['side'],'quantity':filled,'order':detail,'mode':self.mode,'purpose':p['reason']},actual)
++        return True
++
++    def _finish(self,intent,fill,actual):
++        j=self.cfg.pairs.index(intent['payload']['pair']);self.owned[j]=actual
++        p=intent['payload'];q0=float(p['before_qty']);delta=actual-q0
++        book=self.store.get('sigma_cost_basis',{})
++        previous=book.get(p['pair'],{'basis':0.,'realized':0.})
++        detail=fill.get('order',{}) or fill.get('response',{})
++        price=float(detail.get('FilledAverPrice') or detail.get('ClosePrice') or detail.get('EntryPrice') or 0)
++        fee=float(detail.get('CommissionChargeValue') or detail.get('CloseFee') or detail.get('OpenFee') or 0)
++        if detail.get('CommissionCoin')==p['pair'].split('/')[0]:fee*=price
++        previous['realized']-=fee
++        if delta and price:
++            if q0==0 or q0*delta>0:
++                previous['basis']=price if p.get('side')=='SHORT_OPEN' else (abs(q0)*previous['basis']+abs(delta)*price)/(abs(q0)+abs(delta))
++            else:
++                previous['realized']+=float(detail['RealizedPNL']) if p.get('side')=='SHORT_CLOSE' and 'RealizedPNL' in detail else min(abs(q0),abs(delta))*np.sign(q0)*(price-previous['basis'])
++        if fill['quantity']>0 and q0!=0 and q0*delta<0 and abs(actual)<10**-int(self.meta[p['pair']]['AmountPrecision']):
++            self.risk['consecutive_losses']=self.risk.get('consecutive_losses',0)+1 if previous['realized']<0 else 0
++            fill['closed_or_dust_position_net_pnl']=previous['realized']
++            previous={'basis':previous['basis'] if actual else 0.,'realized':0.}
++        book[p['pair']]=previous
++        with self.store.db:
++            self.store.db.execute("INSERT INTO kv VALUES('sigma_owned',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",(json.dumps(self.owned),))
++            self.store.db.execute("INSERT INTO kv VALUES('sigma_cost_basis',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",(json.dumps(book),))
++            self.store.db.execute("INSERT INTO kv VALUES('sigma_risk',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value",(json.dumps(self.risk),))
++            if fill['quantity']>0:self.store.db.execute('INSERT OR IGNORE INTO fills VALUES(?,?,?)',(intent['id'],self.api.now_ms(),json.dumps(fill)))
++            self.store.db.execute("UPDATE intents SET status='done' WHERE id=?",(intent['id'],))
++        self.store.event('sigma_order_terminal',fill)
++
++    def submit(self,pair,side,quantity,price,reason,ticker,qty,free,nav):
++        # Last possible entry check: API reads and reconciliation can consume
++        # the entire test budget. Cleanup writes remain reduce-only.
++        if self.session.get('deadline_ms') and self.api.now_ms()>=self.session['deadline_ms']:
++            self.session['stopping']=True
++            self.store.set('sigma_session',self.session)
++        if side in {'BUY','SHORT_OPEN'} and (self.session.get('stopping') or self.stop_requested):
++            return
++        if self.store.unfinished():return
++        j=self.cfg.pairs.index(pair);meta=self.meta[pair]
++        qstr=decimal_string(quantity,int(meta['AmountPrecision']))
++        if float(qstr)<=0:return
++        quote=ticker['Data'][pair];ref=float(quote['MinAsk'] if side in {'BUY','SHORT_CLOSE'} else quote['MaxBid'])
++        if float(qstr)*ref<=max(float(meta['MiniOrder']),1):return
++        typ='LIMIT' if price is not None and side in {'BUY','SELL'} else 'MARKET'
++        pstr=None if price is None else format(Decimal(str(price)).quantize(Decimal(1).scaleb(-int(meta['PricePrecision'])),rounding=ROUND_UP if side=='SELL' else 'ROUND_DOWN'),'f')
++        p={'pair':pair,'side':side,'quantity':qstr,'type':typ,'price':pstr,'before_qty':float(qty[j]),'before_usd':float(free),'request_timestamp':self.api.now_ms(),'mode':self.mode,'reason':reason,'config_hash':self.cfg.fingerprint,'commit':self.version}
++        key=self.store.intent(f"sigma|{pair}|{side}|{p['request_timestamp']}",p,p['request_timestamp'])
++        if key is None:return
++        self.store.event('sigma_order_intent',{'intent':key,**p})
++        try:
++            if side=='SHORT_OPEN':r=self.api.short_open(pair,decimal_string(min(quantity*ref,free/(1+self.cfg.taker_fee)),2))
++            elif side=='SHORT_CLOSE':r=self.api.short_close(pair,qstr)
++            elif typ=='LIMIT':r=self.api.place_limit(pair,side,qstr,pstr)
++            else:r=self.api.place(pair,side,qstr)
++        except AmbiguousWrite:
++            self.store.update_intent(key,'unknown');return
++        except ApiError as e:
++            self.store.update_intent(key,'rejected',{'error':str(e)})
++            if side=='SHORT_OPEN' and 'does not allow' in str(e):
++                self.store.set('sigma_short_permission',False)
++                self.store.event('sigma_short_disabled',{'reason':str(e),'action':'future targets exclude shorts'})
++            return
++        self.store.update_intent(key,'acknowledged',r)
++
++    def cycle(self):
++        now=self.api.now_ms()
++        if time.monotonic()-self.api.last_sync>1800:now=self.api.sync_time()
++        self.refresh(now)
++        ticker=self.api.ticker()
++        if abs(int(ticker.get('ServerTime',0))-now)>120000:raise ApiError('Stale Roostoo ticker')
++        if self.session.get('deadline_ms') and now>=self.session['deadline_ms']:self.session['stopping']=True
++        if self.stop_requested:self.session['stopping']=True
++        self.store.set('sigma_session',self.session)
++        # Check risk with known partial ownership before deciding whether a
++        # resting order may remain. Ownership is audited after reconciliation.
++        nav,free,qty,values,wallet,shorts=self.snapshot(ticker,check_orders=False)
++        halt=risk_reason(nav,now,self.risk,self.cfg)
++        self.store.set('sigma_risk',self.risk)
++        if time.monotonic()-self.last_report>=60:
++            self.report(nav,qty,halt);self.last_report=time.monotonic()
++        end=int(pd.Timestamp(self.cfg.competition_end).timestamp()*1000)
++        finishing=now>=end-300000
++        if finishing:self.session['stopping']=True
++        if not self.reconcile(ticker):return False
++        if self.mode=='paper-exchange':
++            nav,free,qty,values,wallet,shorts=self.snapshot(ticker)
++            halt=risk_reason(nav,self.api.now_ms(),self.risk,self.cfg)
++            self.store.set('sigma_risk',self.risk)
++            for j,p in enumerate(self.cfg.pairs):
++                tolerance=max(1e-8,abs(self.owned[j])*1e-8)
++                if abs(qty[j]-self.owned[j])>tolerance:raise ApiError('Unmanaged holding or conflicting bot; no mutations')
++        if self.session.get('deadline_ms') and self.api.now_ms()>=self.session['deadline_ms']:
++            self.session['stopping']=True;self.store.set('sigma_session',self.session)
++        if self.features is not None:
++            f=self.features;i=len(f.index)-1
++            hour=int(f.index[i].timestamp()*1000)//HOUR
++            fresh=now-int(f.index[i].timestamp()*1000)<2*HOUR
++            if fresh and hour!=self.last_hour:
++                # Carry hysteresis from the last persisted decision when a
++                # rolling live data window no longer contains the old crossing.
++                if self.last_hour is not None and self.policy.get('gates'):
++                    new=np.flatnonzero((f.index.view('int64')//10**9//3600)>self.last_hour)
++                    for lb in self.cfg.gate_lookbacks:
++                        previous=np.asarray(self.policy['gates'].get(str(lb),[0.]*len(self.cfg.pairs)))
++                        for row in new:
++                            if row<lb:continue
++                            z=np.log(f.close[row]/f.close[row-lb])/(f.slow_vol[row]*np.sqrt(lb))
++                            previous=np.where(np.abs(z)>self.cfg.dead_band,np.sign(z),previous)
++                            f.gates[str(lb)][row]=previous
++                    f.score[new]=sum(f.gates[str(lb)][new] for lb in self.cfg.gate_lookbacks)/len(self.cfg.gate_lookbacks)
++                c=self.cfg if self.store.get('sigma_short_permission',True) else replace(self.cfg,allow_shorts=False)
++                w,d=target_weights(f,i,values/nav,nav,self.policy,c)
++                total=float(np.abs(w).sum())
++                if total*nav>self.cap:w*=self.cap/(total*nav)
++                d['unscaled_target_gross']=total;d['gross']=float(np.abs(w).sum())
++                self.targets=w.tolist();self.last_hour=hour
++                self.store.set('sigma_policy',self.policy);self.store.set('sigma_targets',self.targets);self.store.set('sigma_last_hour',hour)
++                self.store.event('sigma_target',{'mode':self.mode,'config_hash':self.cfg.fingerprint,'closed_bar_utc':f.index[i].isoformat(),'weights':self.targets,'equity':nav,**d})
++            elif not fresh:
++                halt=halt or 'stale_external_data'
++        elif not halt and not self.session.get('stopping'):
++            self.store.event('sigma_wait',{'reason':'loading_closed_hourly_history','mode':self.mode});return False
++        if halt or self.session.get('stopping'):self.targets=[0.]*len(self.cfg.pairs)
++        target=np.asarray(self.targets)*nav
++        if time.monotonic()-self.last_report>=60:
++            self.report(nav,qty,halt);self.last_report=time.monotonic()
++        if self.mode=='shadow':
++            self.store.event('sigma_shadow_plan',{'weights':self.targets,'equity_reference':nav,'account_writes':0,'profitability_evidence':False})
++            return bool(self.session.get('stopping'))
++        # Risk reductions precede all increases; at most one unresolved order.
++        legs=[]
++        for j,pair in enumerate(self.cfg.pairs):
++            current=values[j];desired=target[j]
++            reduce=current!=0 and (np.sign(current)!=np.sign(desired) or abs(desired)<abs(current))
++            ref=float(ticker['Data'][pair]['MinAsk'] if current<0 else ticker['Data'][pair]['MaxBid'])
++            delta=abs(current) if current*desired<0 else abs(desired-current)
++            minimum=min(self.cfg.min_trade_usd,max(5,self.cap*.05))
++            if delta<minimum and not (reduce and desired==0):continue
++            amount=min(delta,self.cfg.max_order_fraction*nav)
++            if not reduce:
++                gross=float(np.abs(values).sum())
++                cap=self.cfg.major_cap if pair in {'BTC/USD','ETH/USD'} else self.cfg.other_cap
++                amount=min(amount,free/(1+self.cfg.taker_fee),max(0,min(self.cfg.gross_cap*nav,self.cap)-gross),max(0,cap*nav-abs(current)))
++            if amount<=float(self.meta[pair]['MiniOrder']):continue
++            side='SHORT_CLOSE' if current<0 and reduce else 'SELL' if reduce else 'SHORT_OPEN' if desired<0 else 'BUY'
++            q=amount/ref
++            if reduce:q=min(q,abs(qty[j]))
++            urgent=bool(halt or self.session.get('stopping') or desired==0 or current*desired<0)
++            fallback=self.store.get('sigma_fallback_'+pair,False)
++            price=None if not self.prefer_passive or urgent or fallback or side.startswith('SHORT') else float(ticker['Data'][pair]['MaxBid' if side=='BUY' else 'MinAsk'])
++            legs.append((0 if reduce else 1,j,pair,side,q,price,'risk_reduction' if urgent else 'allocation'))
++        if legs:
++            _,j,pair,side,q,price,reason=sorted(legs,key=lambda x:(x[0],-abs(target[x[1]]-values[x[1]])))[0]
++            self.submit(pair,side,q,price,reason,ticker,qty,free,nav)
++            if price is None:self.store.set('sigma_fallback_'+pair,False)
++            return False
++        dust_limits=np.array([max(float(self.meta[p]['MiniOrder']),2*10**-int(self.meta[p]['AmountPrecision'])*float(ticker['Data'][p]['MaxBid'])) for p in self.cfg.pairs])
++        clean=bool((np.abs(values)<dust_limits).all() and not shorts and not self.store.unfinished())
++        if self.session.get('stopping') and clean:
++            self.report(nav,qty,halt)
++            self.session['complete']=True;self.store.set('sigma_session',self.session);return True
++        self.report(nav,qty,halt)
++        return False
++
++    def report(self,nav,qty,halt):
++        root=Path(self.cfg.runtime_dir)/'reports'/('sigma-'+self.mode);root.mkdir(parents=True,exist_ok=True)
++        status={'mode':self.mode,'config_hash':self.cfg.fingerprint,'equity':nav,'return':nav/self.risk.get('initial',nav)-1,'holdings':dict(zip(self.cfg.pairs,qty.tolist())),'targets':dict(zip(self.cfg.pairs,self.targets)),'risk':self.risk,'halt':halt,'session':self.session,'portfolio_cap_usd':self.cap,'prefer_passive':self.prefer_passive,'fill_records':len(self.store.fills()),'unresolved_orders':len(self.store.unfinished())}
++        (root/'status.json').write_text(json.dumps(status,indent=2,allow_nan=False))
++        pd.DataFrame(self.store.fills()).to_csv(root/'trade_logs.csv',index=False)
++        (root/'summary.txt').write_text(f"Sigma {self.mode}\nEquity: {nav:.2f}\nReturn: {status['return']:.6%}\nHalt: {halt or 'none'}\nPortfolio cap: ${self.cap:.2f}\nConfirmed records: {status['fill_records']}\nHistorical profitability is separate from observed account returns.\n")
++
++    def run(self,once=False):
++        def stop(*_):self.stop_requested=True
++        previous={s:signal.signal(s,stop) for s in (signal.SIGINT,signal.SIGTERM)}
++        try:
++            if once:
++                self.refresh(self.api.now_ms())
++                if self.future is not None:
++                    self.features=self.future.result();self.future=None
++            while True:
++                try:
++                    done=self.cycle()
++                    if done or once:break
++                except (ApiError,ValueError) as e:
++                    self.store.event('sigma_pause',{'error':str(e),'action':'no blind resubmission; risk journal preserved'})
++                    if once:raise
++                time.sleep(self.cfg.poll_seconds)
++        finally:
++            self.pool.shutdown(wait=True)
++            self.store.close();self.lock.close()
++            for s,h in previous.items():signal.signal(s,h)
++
++
++def diagnose(cfg,mode='paper-exchange',remote=False):
++    store=Store(Path(cfg.runtime_dir)/('sigma_'+mode.replace('-','_')+'.sqlite3'))
++    try:
++        report={'mode':mode,'config_hash':cfg.fingerprint,'risk':store.get('sigma_risk',{}),'owned_quantities':store.get('sigma_owned',[]),'targets':store.get('sigma_targets',[]),'session':store.get('sigma_session',{}),'unresolved':store.unfinished(),'fill_records':store.fills(),'account_mutations':0}
++        if remote:
++            api=Roostoo(cfg.base_url,cfg.spacing);api.sync_time()
++            accounts=api.balance_accounts();shorts=api.short_positions();ticker=api.ticker()
++            nav,free,qty,values=account_snapshot(accounts,shorts,ticker,cfg)
++            report['remote']={'equity_after_estimated_liquidation':nav,'free_usd':free,'wallet_schema':accounts['schema'],'pending_orders':api.query_orders(pending_only=True),'short_positions':shorts,'holdings':dict(zip(cfg.pairs,qty.tolist())),'gross_usd':float(np.abs(values).sum())}
++        return report
++    finally:store.close()
+diff --git a/sentinel/sigma_origin/__init__.py b/sentinel/sigma_origin/__init__.py
+new file mode 100644
+index 0000000..446f185
+--- /dev/null
++++ b/sentinel/sigma_origin/__init__.py
+@@ -0,0 +1 @@
++"""Pinned Sigma Gate reference components; see THIRD_PARTY_LICENSES.md."""
+diff --git a/sentinel/sigma_origin/backtest/__init__.py b/sentinel/sigma_origin/backtest/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/sentinel/sigma_origin/backtest/engine.py b/sentinel/sigma_origin/backtest/engine.py
+new file mode 100644
+index 0000000..c18b066
+--- /dev/null
++++ b/sentinel/sigma_origin/backtest/engine.py
+@@ -0,0 +1,167 @@
++"""Execution-aware hourly backtester.
++
++Uses the *same* strategy.compute + portfolio.policy code as the live bot. What
++it models, deliberately conservatively:
++
++  * Competition fees: long-side maker 5 bps / taker 10 bps; shorts 10 bps
++    on both legs (the /v6 short endpoints charge 0.1% regardless of order type).
++  * Maker orders: a passive limit at the decision-time close. It fills ONLY if
++    the next bar trades *through* the limit by `touch_bps` (fills at the touch
++    are not assumed). This builds in adverse selection: buy limits fill exactly
++    when price drops. After `maker_patience` failed hours the remainder is sent
++    as a taker order.
++  * Taker orders: fill at close +/- half the tick-implied spread + slippage.
++  * Signed accounting (shorts add proceeds to cash, liability marked to market),
++    which is equivalent to Roostoo's collateral mechanics.
++  * Decisions at bar t use information up to the close of t only.
++"""
++
++from __future__ import annotations
++
++from dataclasses import dataclass, field
++
++import numpy as np
++import pandas as pd
++
++from ..portfolio.policy import PolicyParams, PolicyState, target_weights
++from ..strategy.core import StrategyOutput
++
++
++@dataclass
++class ExecParams:
++    maker_fee: float = 0.0005
++    taker_fee: float = 0.0010
++    short_fee: float = 0.0010
++    touch_bps: float = 2.0
++    slippage_bps: float = 1.0
++    maker_patience: int = 1  # hours a limit may rest before crossing
++    use_maker: bool = True
++    decision_every: int = 1  # hours between strategy decisions
++
++
++@dataclass
++class BacktestResult:
++    nav: pd.Series
++    weights: pd.DataFrame
++    trades: pd.DataFrame
++    diag: pd.DataFrame
++    fees: float
++    turnover: float
++    maker_ratio: float = 0.0
++    meta: dict = field(default_factory=dict)
++
++
++def run(
++    out: StrategyOutput,
++    close: pd.DataFrame,
++    high: pd.DataFrame,
++    low: pd.DataFrame,
++    pol: PolicyParams,
++    ex: ExecParams,
++    initial: float = 100_000.0,
++    start: pd.Timestamp | None = None,
++    end: pd.Timestamp | None = None,
++    half_spread_bps: pd.Series | None = None,
++) -> BacktestResult:
++    idx = close.index
++    if start is not None:
++        idx = idx[idx >= start]
++    if end is not None:
++        idx = idx[idx < end]
++    cols = list(close.columns)
++    C = close.reindex(idx)[cols].values
++    Hh = high.reindex(idx)[cols].values
++    Ll = low.reindex(idx)[cols].values
++    hs = (half_spread_bps.reindex(cols).fillna(1.0).values if half_spread_bps is not None else np.ones(len(cols))) / 1e4
++    slip = ex.slippage_bps / 1e4
++    touch = ex.touch_bps / 1e4
++
++    qty = np.zeros(len(cols))
++    cash = initial
++    st = PolicyState(peak_nav=initial)
++    pending = {}  # j -> dict(qty, limit, age)
++    navs, wrows, diags, trades = [], [], [], []
++    fees = turnover = maker_notional = taker_notional = 0.0
++
++    alpha, vol, regime, rets = out.alpha, out.vol, out.regime, out.returns
++
++    for ti, t in enumerate(idx):
++        px = C[ti]
++        valid = ~np.isnan(px)
++        # ---- 1) resolve resting maker orders against this bar's range
++        for j in list(pending):
++            o = pending[j]
++            if not valid[j]:
++                continue
++            filled = (o["qty"] > 0 and Ll[ti, j] <= o["limit"] * (1 - touch)) or (
++                o["qty"] < 0 and Hh[ti, j] >= o["limit"] * (1 + touch)
++            )
++            if filled:
++                notional = abs(o["qty"]) * o["limit"]
++                cash -= o["qty"] * o["limit"] + notional * ex.maker_fee
++                qty[j] += o["qty"]
++                fees += notional * ex.maker_fee
++                turnover += notional
++                maker_notional += notional
++                trades.append((t, cols[j], o["qty"], o["limit"], "maker"))
++                del pending[j]
++            else:
++                o["age"] += 1
++
++        mark = np.where(valid, px, 0.0)
++        nav = cash + float(np.nansum(qty * mark))
++        navs.append(nav)
++
++        if ti % ex.decision_every != 0 or ti == len(idx) - 1:
++            continue
++        # ---- 2) strategy decision with information up to close t
++        cur_w = pd.Series(np.where(valid, qty * mark / nav, 0.0), index=cols)
++        a_row = alpha.loc[t].reindex(cols) if t in alpha.index else pd.Series(np.nan, index=cols)
++        # never open into an asset with no price this bar
++        a_row[~valid] = np.nan
++        w_t, d = target_weights(
++            a_row, vol.loc[t].reindex(cols), regime.loc[t], rets.loc[:t].tail(pol.cov_window), cur_w, nav, st, pol
++        )
++        d["t"] = t
++        diags.append(d)
++        w_t = w_t.reindex(cols).fillna(0.0).values
++        wrows.append((t, w_t.copy()))
++
++        # ---- 3) orders
++        for j in range(len(cols)):
++            if not valid[j]:
++                continue
++            target_q = w_t[j] * nav / px[j]
++            dq = target_q - qty[j]
++            if abs(dq * px[j]) < pol.min_trade_usd and w_t[j] != 0:
++                pending.pop(j, None)
++                continue
++            if abs(dq) < 1e-12:
++                pending.pop(j, None)
++                continue
++            # a short leg (opening or covering) is always a /v6 taker
++            crosses_short = (qty[j] < 0) or (target_q < 0)
++            o = pending.get(j)
++            patience_left = (o is None) or (o["age"] < ex.maker_patience)
++            if ex.use_maker and not crosses_short and patience_left:
++                age = 0 if o is None or np.sign(o["qty"]) != np.sign(dq) else o["age"]
++                pending[j] = {"qty": dq, "limit": px[j], "age": age}
++                continue
++            pending.pop(j, None)
++            side = np.sign(dq)
++            fill = px[j] * (1 + side * (hs[j] + slip))
++            fee_rate = ex.short_fee if crosses_short else ex.taker_fee
++            notional = abs(dq) * fill
++            cash -= dq * fill + notional * fee_rate
++            qty[j] += dq
++            fees += notional * fee_rate
++            turnover += notional
++            taker_notional += notional
++            trades.append((t, cols[j], dq, fill, "taker"))
++
++    nav_s = pd.Series(navs, index=idx[: len(navs)])
++    W = pd.DataFrame([w for _, w in wrows], index=[t for t, _ in wrows], columns=cols)
++    T = pd.DataFrame(trades, columns=["t", "pair", "qty", "price", "liquidity"])
++    D = pd.DataFrame(diags).set_index("t") if diags else pd.DataFrame()
++    tot = maker_notional + taker_notional
++    return BacktestResult(nav_s, W, T, D, fees, turnover / initial, maker_notional / tot if tot else 0.0)
+diff --git a/sentinel/sigma_origin/metrics.py b/sentinel/sigma_origin/metrics.py
+new file mode 100644
+index 0000000..4b940e2
+--- /dev/null
++++ b/sentinel/sigma_origin/metrics.py
+@@ -0,0 +1,155 @@
++"""Performance + statistical-confidence metrics.
++
++The organizer scores 0.4*Sortino + 0.3*Sharpe + 0.3*Calmar but has not published
++the annualisation convention. We compute everything from the NAV path with an
++explicit `periods_per_year` (crypto trades 24/7: hourly -> 8760) so that
++strategies are always compared on one convention. Note the asymmetry this
++creates: over a 14-day window an annualised Calmar = (annualised return / MDD)
++can be an order of magnitude larger than Sharpe/Sortino, so *max drawdown is the
++single most leveraged quantity in the composite* -- the risk layer is designed
++around that.
++
++Because 14 days of crypto returns are extremely noisy, point estimates are not
++enough. We also report:
++  * Probabilistic Sharpe Ratio (Bailey & Lopez de Prado 2012): P(true SR > SR*)
++    correcting for skew and fat tails of the return distribution.
++  * Deflated Sharpe threshold for N trials (multiple-testing correction).
++  * Stationary block-bootstrap confidence intervals (Politis & Romano 1994),
++    which respect volatility clustering / autocorrelation.
++"""
++
++from __future__ import annotations
++
++import math
++
++import numpy as np
++import pandas as pd
++
++HOURS_PER_YEAR = 24 * 365
++
++
++def returns_from_nav(nav: pd.Series) -> pd.Series:
++    return nav.pct_change().dropna()
++
++
++def max_drawdown(nav: pd.Series | np.ndarray) -> float:
++    x = np.asarray(nav, dtype=float)
++    if len(x) == 0:
++        return 0.0
++    peak = np.maximum.accumulate(x)
++    return float(np.max(1 - x / peak))
++
++
++def sharpe(r: np.ndarray, ppy: float = HOURS_PER_YEAR) -> float:
++    r = np.asarray(r, float)
++    sd = r.std(ddof=1) if len(r) > 1 else 0.0
++    return float(r.mean() / sd * math.sqrt(ppy)) if sd > 0 else 0.0
++
++
++def sortino(r: np.ndarray, ppy: float = HOURS_PER_YEAR) -> float:
++    r = np.asarray(r, float)
++    dd = np.sqrt(np.mean(np.minimum(r, 0.0) ** 2)) if len(r) else 0.0  # target = 0
++    return float(r.mean() / dd * math.sqrt(ppy)) if dd > 0 else 0.0
++
++
++def calmar(nav: np.ndarray, ppy: float = HOURS_PER_YEAR, annualise: bool = True) -> float:
++    nav = np.asarray(nav, float)
++    if len(nav) < 2:
++        return 0.0
++    total = nav[-1] / nav[0] - 1
++    ret = (1 + total) ** (ppy / (len(nav) - 1)) - 1 if annualise else total
++    mdd = max_drawdown(nav)
++    return float(ret / mdd) if mdd > 1e-12 else 0.0
++
++
++def composite(nav: np.ndarray, ppy: float = HOURS_PER_YEAR, annualise_calmar: bool = True) -> float:
++    r = np.diff(nav) / nav[:-1]
++    return 0.4 * sortino(r, ppy) + 0.3 * sharpe(r, ppy) + 0.3 * calmar(nav, ppy, annualise_calmar)
++
++
++def probabilistic_sharpe(r: np.ndarray, sr_benchmark: float = 0.0) -> float:
++    """PSR on per-period (non-annualised) Sharpe. Returns P(SR_true > benchmark)."""
++    r = np.asarray(r, float)
++    n = len(r)
++    if n < 10 or r.std(ddof=1) == 0:
++        return 0.5
++    sr = r.mean() / r.std(ddof=1)
++    z = (r - r.mean()) / r.std(ddof=0)
++    skew, kurt = float(np.mean(z**3)), float(np.mean(z**4))
++    denom = math.sqrt(max(1e-12, 1 - skew * sr + (kurt - 1) / 4 * sr**2))
++    stat = (sr - sr_benchmark) * math.sqrt(n - 1) / denom
++    return float(0.5 * (1 + math.erf(stat / math.sqrt(2))))
++
++
++def deflated_sharpe_threshold(n_trials: int, sr_std_across_trials: float) -> float:
++    """Expected max per-period SR among n_trials zero-skill strategies."""
++    if n_trials < 2:
++        return 0.0
++    g = 0.5772156649
++    from statistics import NormalDist
++
++    nd = NormalDist()
++    return sr_std_across_trials * ((1 - g) * nd.inv_cdf(1 - 1 / n_trials) + g * nd.inv_cdf(1 - 1 / (n_trials * math.e)))
++
++
++def stationary_bootstrap(r: np.ndarray, stat, n_boot: int = 1000, mean_block: int = 24, seed: int = 7) -> np.ndarray:
++    """Politis-Romano stationary bootstrap of `stat(resampled_returns)`."""
++    rng = np.random.default_rng(seed)
++    r = np.asarray(r, float)
++    n = len(r)
++    p = 1.0 / mean_block
++    out = np.empty(n_boot)
++    for b in range(n_boot):
++        idx = np.empty(n, dtype=int)
++        idx[0] = rng.integers(n)
++        jumps = rng.random(n) < p
++        starts = rng.integers(n, size=n)
++        for t in range(1, n):
++            idx[t] = starts[t] if jumps[t] else (idx[t - 1] + 1) % n
++        out[b] = stat(r[idx])
++    return out
++
++
++def summary(
++    nav: pd.Series, ppy: float = HOURS_PER_YEAR, fees_paid: float = 0.0, turnover: float = 0.0, n_trades: int = 0
++) -> dict:
++    nav = nav.dropna()
++    r = returns_from_nav(nav).values
++    total = float(nav.iloc[-1] / nav.iloc[0] - 1) if len(nav) > 1 else 0.0
++    return {
++        "total_return": total,
++        "ann_vol": float(np.std(r, ddof=1) * math.sqrt(ppy)) if len(r) > 1 else 0.0,
++        "sharpe": sharpe(r, ppy),
++        "sortino": sortino(r, ppy),
++        "max_drawdown": max_drawdown(nav.values),
++        "calmar": calmar(nav.values, ppy),
++        "calmar_raw": calmar(nav.values, ppy, annualise=False),
++        "composite": composite(nav.values, ppy),
++        "psr_vs_0": probabilistic_sharpe(r),
++        "fees_paid": fees_paid,
++        "turnover_x_nav": turnover,
++        "n_trades": n_trades,
++        "periods": len(r),
++    }
++
++
++def rolling_window_stats(nav: pd.Series, window: int, step: int, ppy: float = HOURS_PER_YEAR) -> pd.DataFrame:
++    """Distribution of competition-length outcomes: slide a window (e.g. 14 days)
++    over the backtest and score each one as if it were the live competition."""
++    rows = []
++    v = nav.values
++    for s in range(0, len(v) - window, step):
++        seg = v[s : s + window + 1]
++        r = np.diff(seg) / seg[:-1]
++        rows.append(
++            {
++                "start": nav.index[s],
++                "ret": seg[-1] / seg[0] - 1,
++                "mdd": max_drawdown(seg),
++                "sharpe": sharpe(r, ppy),
++                "sortino": sortino(r, ppy),
++                "calmar_raw": calmar(seg, ppy, False),
++                "composite": composite(seg, ppy),
++            }
++        )
++    return pd.DataFrame(rows)
+diff --git a/sentinel/sigma_origin/portfolio/__init__.py b/sentinel/sigma_origin/portfolio/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/sentinel/sigma_origin/portfolio/policy.py b/sentinel/sigma_origin/portfolio/policy.py
+new file mode 100644
+index 0000000..f4733f6
+--- /dev/null
++++ b/sentinel/sigma_origin/portfolio/policy.py
+@@ -0,0 +1,280 @@
++"""Path-dependent portfolio policy shared by backtest and live.
++
++alpha row (+ regime, vol, covariance, current weights, NAV path)
++  -> entry/exit hysteresis       (no churn around a threshold)
++  -> risk-budgeted raw weights   (w ~ alpha / vol)
++  -> regime net-exposure scaling (risk_on decides how much crypto beta we carry)
++  -> covariance-aware vol target (portfolio risk, not sum of single-asset risks)
++  -> hard caps                   (per asset, gross <= 1x NAV: spot, no leverage)
++  -> drawdown governor           (Calmar = return / MaxDD: protect the path)
++  -> no-trade band               (only trade when the change is worth the fee)
++"""
++
++from __future__ import annotations
++
++from dataclasses import dataclass, field
++
++import numpy as np
++import pandas as pd
++
++
++@dataclass
++class PolicyParams:
++    mode: str = "long_only"  # long_only | long_short | neutral
++    sizing: str = "normalize"  # normalize: scale book to gross budget | absolute: alpha x inverse-vol basket
++    use_regime_gross: bool = False  # research: trend-timing of gross exposure did NOT help
++    enter: float = 0.30  # |alpha| to open a position
++    exit: float = 0.10  # |alpha| below which an open position is closed
++    allow_short: bool = True
++    short_regime_max: float = -0.25  # shorts only when market trend below this
++    short_scale: float = 0.5  # shorts are sized smaller (fee 0.1% both legs + squeeze risk)
++    target_vol_ann: float = 0.30
++    max_gross: float = 0.95  # <= 1.0 by rule; keep 5% cash buffer for fees/rounding
++    max_weight: float = 0.20
++    max_weight_major: float = 0.35
++    majors: tuple = ("BTC/USD", "ETH/USD")
++    min_risk_on_gross: float = 0.15  # floor on gross budget even in risk-off
++    cov_window: int = 24 * 14
++    cov_shrink: float = 0.3  # shrink correlation matrix toward constant-correlation
++    dd_soft: float = 0.03  # start de-risking at 3% drawdown from peak
++    dd_hard: float = 0.10  # minimum exposure reached at 10%
++    dd_floor: float = 0.25
++    dd_peak_window_h: int = 336  # drawdown measured from the rolling 14-day peak (= contest length)
++    band_abs: float = 0.02  # do not trade a name unless |dw| > 2% NAV ...
++    band_rel: float = 0.25  # ... or > 25% of its target
++    min_trade_usd: float = 50.0
++    # Tournament end-game mode (0 = off). Holds a fixed net-long inverse-vol basket of the universe,
++    # ignoring the trend gates, because a negative contest return makes every scored ratio negative.
++    endgame_long: float = 0.0
++    endgame_floor_return: float = -0.045  # below this contest return -> flat (protect the top-20 cut)
++    endgame_goal_return: float = 1.0  # at/above this contest return -> lock in: flat for good (R9)
++    initial_nav: float = 100_000.0
++
++
++@dataclass
++class PolicyState:
++    peak_nav: float = 0.0
++    active: dict = field(default_factory=dict)  # pair -> +1 / -1 for open positions (hysteresis)
++    nav_hist: list = field(default_factory=list)  # recent decision-time NAVs for the rolling peak
++    endgame_lock: str = ""  # "" | "goal" | "floor" -- sticky, persisted by the live runner
++
++    def update_peak(self, nav: float, window: int) -> float:
++        if window <= 0:
++            self.peak_nav = max(self.peak_nav, nav)
++            return self.peak_nav
++        self.nav_hist.append(nav)
++        if len(self.nav_hist) > window:
++            del self.nav_hist[: len(self.nav_hist) - window]
++        self.peak_nav = max(self.nav_hist)
++        return self.peak_nav
++
++
++def shrunk_cov(returns: np.ndarray, shrink: float) -> np.ndarray:
++    """Sample covariance with correlation shrunk toward its average (constant-corr target)."""
++    x = returns - np.nanmean(returns, axis=0)
++    x = np.nan_to_num(x)
++    cov = x.T @ x / max(1, len(x) - 1)
++    sd = np.sqrt(np.clip(np.diag(cov), 1e-12, None))
++    corr = cov / np.outer(sd, sd)
++    n = len(sd)
++    rho = (corr.sum() - n) / max(1, n * (n - 1))
++    target = np.full_like(corr, rho)
++    np.fill_diagonal(target, 1.0)
++    corr_s = (1 - shrink) * corr + shrink * target
++    return corr_s * np.outer(sd, sd)
++
++
++def drawdown_multiplier(nav: float, peak: float, p: PolicyParams) -> float:
++    dd = 1 - nav / peak if peak > 0 else 0.0
++    if dd <= p.dd_soft:
++        return 1.0
++    if dd >= p.dd_hard:
++        return p.dd_floor
++    frac = (dd - p.dd_soft) / (p.dd_hard - p.dd_soft)
++    return 1.0 - frac * (1.0 - p.dd_floor)
++
++
++def target_weights(
++    alpha: pd.Series,
++    vol: pd.Series,
++    regime: pd.Series,
++    recent_returns: pd.DataFrame,
++    current_w: pd.Series,
++    nav: float,
++    st: PolicyState,
++    p: PolicyParams,
++    shorts_enabled: bool = True,
++) -> tuple[pd.Series, dict]:
++    """Return (final target weights, diagnostics). Weights are signed fractions of NAV."""
++    st.update_peak(nav, p.dd_peak_window_h)
++    if p.endgame_long > 0:
++        return _endgame(alpha, vol, current_w, nav, st, p)
++    a = alpha.dropna()
++    trend = float(regime.get("mkt_trend", 0.0) or 0.0)
++    risk_on = float(np.clip(regime.get("risk_on", 0.5) if pd.notna(regime.get("risk_on")) else 0.5, 0, 1))
++    if p.mode == "long_only" or not (p.allow_short and shorts_enabled):
++        can_short = False
++    elif p.mode == "neutral":
++        can_short = True
++    else:
++        can_short = trend < p.short_regime_max
++
++    # 1) hysteresis on entry/exit
++    sel = {}
++    for k, v in a.items():
++        side = st.active.get(k, 0)
++        if side > 0 and v > p.exit:
++            sel[k] = v
++        elif side < 0 and v < -p.exit and can_short:
++            sel[k] = v
++        elif v > p.enter:
++            sel[k] = v
++        elif v < -p.enter and can_short:
++            sel[k] = v
++    st.active = {k: int(np.sign(v)) for k, v in sel.items()}
++    if not sel:
++        w = pd.Series(0.0, index=current_w.index.union(alpha.index))
++        return _band(w, current_w, nav, p), {"gross": 0.0, "risk_on": risk_on, "dd_mult": 1.0, "n": 0}
++
++    s = pd.Series(sel)
++    if p.sizing == "absolute":
++        return _absolute(s, alpha, vol, recent_returns, current_w, nav, st, p, risk_on, trend, can_short)
++    v = vol.reindex(s.index).replace(0, np.nan).fillna(vol.median())
++    raw = s / (v * np.sqrt(24))  # risk-budget: alpha per unit of daily vol
++    raw[raw < 0] *= p.short_scale
++
++    # 2) gross budget (optionally regime-scaled) and side construction
++    gross_budget = p.max_gross * (max(p.min_risk_on_gross, risk_on) if p.use_regime_gross else 1.0)
++    if p.mode == "neutral" and can_short:
++        L, Sh = raw[raw > 0], raw[raw < 0]
++        if len(L) == 0 or len(Sh) == 0:
++            raw = raw * 0.0
++        else:
++            raw = pd.concat([L / L.sum() * gross_budget / 2, Sh / -Sh.sum() * gross_budget / 2])
++    elif raw.abs().sum() > 0:
++        raw = raw / raw.abs().sum() * gross_budget
++
++    # 3) covariance-aware vol targeting (only ever scales DOWN to the budget)
++    cols = [c for c in raw.index if c in recent_returns.columns]
++    rr = recent_returns[cols].tail(p.cov_window).values
++    if len(rr) > 48 and len(cols) > 0:
++        cov = shrunk_cov(rr, p.cov_shrink) * 24 * 365
++        wv = raw[cols].values
++        port_vol = float(np.sqrt(max(wv @ cov @ wv, 1e-12)))
++        if port_vol > p.target_vol_ann:
++            raw = raw * (p.target_vol_ann / port_vol)
++    else:
++        port_vol = float("nan")
++
++    # 4) hard caps
++    caps = pd.Series({k: (p.max_weight_major if k in p.majors else p.max_weight) for k in raw.index})
++    raw = raw.clip(-caps, caps)
++    if raw.abs().sum() > p.max_gross:
++        raw = raw / raw.abs().sum() * p.max_gross
++
++    # 5) drawdown governor
++    m = drawdown_multiplier(nav, st.peak_nav, p)
++    raw = raw * m
++
++    w = raw.reindex(current_w.index.union(raw.index).union(alpha.index)).fillna(0.0)
++    diag = {
++        "gross": float(w.abs().sum()),
++        "net": float(w.sum()),
++        "risk_on": risk_on,
++        "mkt_trend": trend,
++        "dd_mult": m,
++        "ex_ante_vol": port_vol,
++        "n": int((w != 0).sum()),
++        "can_short": can_short,
++    }
++    return _band(w, current_w, nav, p), diag
++
++
++def _absolute(s, alpha, vol, recent_returns, current_w, nav, st, p, risk_on, trend, can_short):
++    """Exposure = signal x inverse-vol basket weight; the *full* basket is scaled to
++    the vol target. So with every gate on we are fully invested at target vol, with
++    one of five gates on we hold only that slice -- exposure falls as trends break,
++    instead of being re-normalised back up to 100%."""
++    uni = alpha.dropna().index
++    v = vol.reindex(uni).replace(0, np.nan)
++    v = v.fillna(v.median())
++    base = (1 / v) / (1 / v).sum()
++    cols = [c for c in uni if c in recent_returns.columns]
++    rr = recent_returns[cols].tail(p.cov_window).values
++    scale, port_vol = 1.0, float("nan")
++    if len(rr) > 48 and cols:
++        cov = shrunk_cov(rr, p.cov_shrink) * 24 * 365
++        b = base.reindex(cols).values
++        port_vol = float(np.sqrt(max(b @ cov @ b, 1e-12)))
++        scale = min(1.0, p.target_vol_ann / port_vol)
++    raw = s * base.reindex(s.index) * scale
++    raw[raw < 0] *= p.short_scale
++    caps = pd.Series({k: (p.max_weight_major if k in p.majors else p.max_weight) for k in raw.index})
++    raw = raw.clip(-caps, caps)
++    if raw.abs().sum() > p.max_gross:
++        raw = raw / raw.abs().sum() * p.max_gross
++    m = drawdown_multiplier(nav, st.peak_nav, p)
++    raw = raw * m
++    w = raw.reindex(current_w.index.union(raw.index).union(alpha.index)).fillna(0.0)
++    diag = {
++        "gross": float(w.abs().sum()),
++        "net": float(w.sum()),
++        "risk_on": risk_on,
++        "mkt_trend": trend,
++        "dd_mult": m,
++        "basket_vol": port_vol,
++        "vol_scale": scale,
++        "n": int((w != 0).sum()),
++        "can_short": can_short,
++    }
++    return _band(w, current_w, nav, p), diag
++
++
++def _endgame(alpha, vol, current_w, nav, st, p):
++    """Fixed net-long inverse-vol basket; flat if the contest return breaches the floor.
++    Caps, gross limit, drawdown governor and no-trade band still apply."""
++    uni = alpha.index[alpha.notna()]
++    ret = nav / p.initial_nav - 1
++    # sticky: once any recent decision-time NAV breached the floor, stay flat (no re-entry whipsaw)
++    worst = min(st.nav_hist) if st.nav_hist else nav
++    if not st.endgame_lock:
++        if min(ret, worst / p.initial_nav - 1) <= p.endgame_floor_return:
++            st.endgame_lock = "floor"
++        elif ret >= p.endgame_goal_return:
++            st.endgame_lock = "goal"
++    floor_hit = bool(st.endgame_lock)
++    v = vol.reindex(uni).replace(0, np.nan)
++    v = v.fillna(v.median())
++    base = (1 / v) / (1 / v).sum()
++    raw = base * (0.0 if floor_hit else p.endgame_long)
++    caps = pd.Series({k: (p.max_weight_major if k in p.majors else p.max_weight) for k in raw.index})
++    raw = raw.clip(-caps, caps)
++    if raw.abs().sum() > p.max_gross:
++        raw = raw / raw.abs().sum() * p.max_gross
++    m = drawdown_multiplier(nav, st.peak_nav, p)
++    raw = raw * m
++    st.active = {k: 1 for k in raw.index if raw[k] > 0}
++    w = raw.reindex(current_w.index.union(raw.index).union(alpha.index)).fillna(0.0)
++    diag = {
++        "gross": float(w.abs().sum()),
++        "net": float(w.sum()),
++        "dd_mult": m,
++        "n": int((w != 0).sum()),
++        "endgame": True,
++        "endgame_floor_hit": bool(floor_hit),
++        "endgame_lock": st.endgame_lock,
++        "contest_return": round(ret, 5),
++        "can_short": False,
++    }
++    return _band(w, current_w, nav, p), diag
++
++
++def _band(w: pd.Series, cur: pd.Series, nav: float, p: PolicyParams) -> pd.Series:
++    """No-trade band: keep current weight unless the change is material.
++    Closing a position entirely (target 0) or flipping sign always passes."""
++    cur = cur.reindex(w.index).fillna(0.0)
++    dw = w - cur
++    thresh = np.maximum(p.band_abs, p.band_rel * w.abs())
++    material = (dw.abs() > thresh) | ((w == 0) & (cur != 0)) | (np.sign(w) * np.sign(cur) < 0)
++    material &= (dw.abs() * nav >= p.min_trade_usd) | (w == 0)
++    return w.where(material, cur)
+diff --git a/sentinel/sigma_origin/strategy/__init__.py b/sentinel/sigma_origin/strategy/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/sentinel/sigma_origin/strategy/core.py b/sentinel/sigma_origin/strategy/core.py
+new file mode 100644
+index 0000000..5315666
+--- /dev/null
++++ b/sentinel/sigma_origin/strategy/core.py
+@@ -0,0 +1,126 @@
++"""Strategy core: data panels -> sleeves -> adaptive ensemble -> raw target weights.
++
++This vectorised stage is identical in backtest and live (live simply runs it on
++the most recent ~60 days and takes the last row). Everything path-dependent
++(drawdown, current holdings, hysteresis, no-trade bands) lives in
++portfolio/policy.py, which is also shared by both modes.
++"""
++
++from __future__ import annotations
++
++from dataclasses import dataclass, field
++
++import numpy as np
++import pandas as pd
++
++from . import signals as S
++from .regime import regime_features
++
++
++@dataclass
++class StrategyParams:
++    vol_halflife: float = 72
++    trend_horizons: tuple = (24, 72, 168, 336)
++    xsmom_lookback: int = 168
++    xsmom_skip: int = 6
++    reversal_lookback: int = 6
++    min_daily_usd: float = 5e6
++    min_history_h: int = 24 * 30
++    max_tick_bps: float = 5.0  # exclude coins whose 1-tick spread is expensive
++    universe: tuple = ()  # whitelist; empty = all eligible crypto pairs
++    gate_lookbacks: tuple = (168, 336, 720)
++    gate_dead_band: float = 0.5  # 0 = plain sign gates (research R6: plateau 0.25-1.0)
++    # ensemble
++    sleeves: tuple = ("trend", "xsmom", "reversal")
++    prior_weights: dict = field(default_factory=lambda: {"trend": 0.45, "xsmom": 0.35, "reversal": 0.20})
++    perf_halflife_h: float = 24 * 10  # memory of sleeve performance
++    shrink: float = 0.6  # 1 = always prior, 0 = pure performance chasing
++    softmax_temp: float = 1.0
++    sleeve_cost_bps: float = 8.0  # cost charged to sleeve paper-portfolios per unit turnover
++
++
++@dataclass
++class StrategyOutput:
++    alpha: pd.DataFrame  # combined score per asset, ~[-1, 1]
++    vol: pd.DataFrame  # hourly EWMA vol per asset
++    eligible: pd.DataFrame
++    regime: pd.DataFrame
++    sleeve_weights: pd.DataFrame  # time x sleeve
++    sleeves: dict
++    returns: pd.DataFrame  # simple hourly returns (for covariance)
++
++
++def tick_bps(close: pd.DataFrame, price_precision: dict[str, int]) -> pd.DataFrame:
++    tick = pd.Series({c: 10.0 ** -price_precision.get(c, 8) for c in close.columns})
++    return (1e4 * tick / close).reindex(columns=close.columns)
++
++
++def _sleeve_paper_returns(score: pd.DataFrame, r_next: pd.DataFrame, vol: pd.DataFrame, cost_bps: float) -> pd.Series:
++    """Dollar-neutral-ish paper portfolio for each sleeve: w ~ score/vol, unit gross.
++    Return realised at t uses weights from t-1 (no look-ahead)."""
++    w = (score / (vol * np.sqrt(24))).replace([np.inf, -np.inf], np.nan).fillna(0)
++    w = w.div(w.abs().sum(axis=1).replace(0, np.nan), axis=0).fillna(0)
++    gross = (w.shift(1) * r_next).sum(axis=1)
++    turnover = (w - w.shift(1)).abs().sum(axis=1)
++    return gross - turnover * cost_bps / 1e4
++
++
++def adaptive_sleeve_weights(paper: pd.DataFrame, p: StrategyParams) -> pd.DataFrame:
++    """Shrunk softmax of each sleeve's exponentially-weighted information ratio.
++
++    w_k = shrink * prior_k + (1-shrink) * softmax(IR_k / temp)
++    A sleeve that has been losing money is down-weighted gradually, not
++    switched off after a couple of bad hours -- with 14 days of live data,
++    hard on/off switching would mostly be fitting noise.
++    """
++    mu = paper.ewm(halflife=p.perf_halflife_h, min_periods=48).mean()
++    sd = paper.ewm(halflife=p.perf_halflife_h, min_periods=48).std()
++    ir = (mu / sd * np.sqrt(24)).fillna(0).clip(-3, 3)  # daily-scaled IR, bounded
++    ex = np.exp(ir / p.softmax_temp)
++    soft = ex.div(ex.sum(axis=1), axis=0)
++    prior = pd.Series(p.prior_weights).reindex(paper.columns).fillna(0)
++    prior = prior / prior.sum()
++    w = soft.mul(1 - p.shrink).add(prior * p.shrink, axis=1)
++    return w.shift(1).fillna(prior)  # use information up to t-1 only
++
++
++def compute(
++    close: pd.DataFrame, quote_vol: pd.DataFrame, p: StrategyParams, price_precision: dict[str, int] | None = None
++) -> StrategyOutput:
++    close = close.sort_index()
++    logp = np.log(close)
++    lr = logp.diff()
++    r = close.pct_change(fill_method=None)
++    vol = S.ewm_vol(lr, p.vol_halflife)
++    elig = S.eligibility(close, quote_vol, p.min_history_h, p.min_daily_usd)
++    if price_precision:
++        elig &= tick_bps(close, price_precision) <= p.max_tick_bps
++    if p.universe:
++        elig &= pd.DataFrame(
++            np.isin(close.columns, p.universe)[None, :].repeat(len(close), 0), index=close.index, columns=close.columns
++        )
++    rm = S.market_return(lr, elig)
++    beta = S.rolling_beta(lr, rm)
++    resid = lr - beta.mul(rm, axis=0)
++
++    sleeves = {}
++    if "trend" in p.sleeves:
++        sleeves["trend"] = S.trend_sleeve(logp, vol, p.trend_horizons).where(elig)
++    if "xsmom" in p.sleeves:
++        sleeves["xsmom"] = S.xsmom_sleeve(resid, elig, vol, p.xsmom_lookback, p.xsmom_skip)
++    if "tgate" in p.sleeves:
++        if p.gate_dead_band > 0:
++            sleeves["tgate"] = S.trend_gate_hysteresis(logp, vol, p.gate_lookbacks, p.gate_dead_band).where(elig)
++        else:
++            sleeves["tgate"] = S.trend_gate_sleeve(logp, p.gate_lookbacks).where(elig)
++    if "reversal" in p.sleeves:
++        sleeves["reversal"] = S.reversal_sleeve(resid, elig, vol, p.reversal_lookback)
++
++    paper = pd.DataFrame(
++        {k: _sleeve_paper_returns(v.fillna(0), r.fillna(0), vol, p.sleeve_cost_bps) for k, v in sleeves.items()}
++    )
++    sw = adaptive_sleeve_weights(paper, p)
++    alpha = sum(sleeves[k].fillna(0).mul(sw[k], axis=0) for k in sleeves)
++    alpha = alpha.where(elig)
++    reg = regime_features(logp, lr, rm, resid, elig)
++    return StrategyOutput(alpha, vol, elig, reg, sw, sleeves, r)
+diff --git a/sentinel/sigma_origin/strategy/regime.py b/sentinel/sigma_origin/strategy/regime.py
+new file mode 100644
+index 0000000..dbddcba
+--- /dev/null
++++ b/sentinel/sigma_origin/strategy/regime.py
+@@ -0,0 +1,70 @@
++"""Market-state (regime) features computed from the whole universe.
++
++Using the cross-section as information is something single-asset bots cannot
++do: breadth, dispersion and average correlation describe *what kind of market
++we are in*, which decides which alpha sleeve should be trusted and how much
++gross risk to run.
++
++Outputs (time-indexed):
++  mkt_trend    in [-1,1]  vol-normalised trend of the equal-weight index
++  breadth      in [0,1]   share of assets above their 7-day EMA
++  vol_ratio    >0         short-term index vol / its 30-day median (>1 = stressed)
++  avg_corr     in [-1,1]  mean pairwise correlation over 3 days (high = no diversification)
++  dispersion   >=0        cross-sectional std of 24h residual returns
++  risk_on      in [0,1]   composite risk appetite used to scale net exposure
++"""
++
++from __future__ import annotations
++
++import numpy as np
++import pandas as pd
++
++
++def _avg_pairwise_corr(r: pd.DataFrame, window: int) -> pd.Series:
++    """Average pairwise correlation via the variance identity:
++    var(sum z) = N + N(N-1) * rho_bar  for standardised z. O(T*N) instead of O(T*N^2)."""
++    mu = r.rolling(window, min_periods=window // 2).mean()
++    sd = r.rolling(window, min_periods=window // 2).std()
++    z = (r - mu) / sd
++    n = z.notna().sum(axis=1)
++    s = z.sum(axis=1, min_count=1)
++    var_s = (s**2).rolling(window, min_periods=window // 2).mean()
++    nbar = n.rolling(window, min_periods=1).mean()
++    rho = (var_s - nbar) / (nbar * (nbar - 1)).clip(lower=1)
++    return rho.clip(-1, 1)
++
++
++def regime_features(
++    logp: pd.DataFrame, r: pd.DataFrame, rm: pd.Series, resid: pd.DataFrame, eligible: pd.DataFrame
++) -> pd.DataFrame:
++    idx = rm.fillna(0).cumsum()
++    vol_m = np.sqrt((rm**2).ewm(halflife=72, min_periods=48).mean())
++    trend = 0.0
++    for h in (72, 168, 336):
++        trend = trend + np.tanh(((idx - idx.shift(h)) / (vol_m * np.sqrt(h))) / 1.5)
++    trend = trend / 3
++
++    ema = logp.ewm(span=168, min_periods=96).mean()
++    above = (logp > ema).where(eligible)
++    breadth = above.mean(axis=1)
++
++    vol_short = np.sqrt((rm**2).ewm(halflife=12, min_periods=12).mean())
++    vol_ratio = vol_short / vol_short.rolling(24 * 30, min_periods=24 * 7).median()
++
++    avg_corr = _avg_pairwise_corr(r.where(eligible), 72)
++    dispersion = resid.rolling(24, min_periods=12).sum().where(eligible).std(axis=1)
++
++    # Risk appetite: trend and breadth agree -> risk on; stressed vol -> scale down.
++    raw = 0.5 * (trend + 1) * 0.6 + breadth.fillna(0.5) * 0.4
++    stress = (1.0 / vol_ratio.clip(lower=1.0)).fillna(1.0) ** 0.5
++    risk_on = (raw * stress).clip(0, 1)
++    return pd.DataFrame(
++        {
++            "mkt_trend": trend,
++            "breadth": breadth,
++            "vol_ratio": vol_ratio,
++            "avg_corr": avg_corr,
++            "dispersion": dispersion,
++            "risk_on": risk_on,
++        }
++    )
+diff --git a/sentinel/sigma_origin/strategy/signals.py b/sentinel/sigma_origin/strategy/signals.py
+new file mode 100644
+index 0000000..dcfec2a
+--- /dev/null
++++ b/sentinel/sigma_origin/strategy/signals.py
+@@ -0,0 +1,116 @@
++"""Alpha sleeves. Every function is causal: row t uses only bars closed at or before t.
++
++All signals are *volatility-normalised* (a 2% move in a 1%-vol coin and a 6%
++move in a 3%-vol coin are the same statistical event) and squashed with tanh,
++so no single outlier print (very common in crypto) can dominate a position.
++
++Sleeves (each returns a time x asset frame of scores in roughly [-1, 1]):
++  trend      -- multi-horizon time-series momentum, |score| ~ strength of trend
++  xsmom      -- cross-sectional momentum on *residual* (beta-adjusted) returns,
++                skipping the most recent hours (where short-term reversal lives)
++  reversal   -- short-horizon residual mean reversion (cross-sectional)
++"""
++
++from __future__ import annotations
++
++import numpy as np
++import pandas as pd
++
++
++def log_returns(close: pd.DataFrame) -> pd.DataFrame:
++    return np.log(close).diff()
++
++
++def ewm_vol(r: pd.DataFrame, halflife: float = 72, min_periods: int = 48) -> pd.DataFrame:
++    """EWMA volatility of hourly returns (RiskMetrics-style, zero mean)."""
++    return np.sqrt((r**2).ewm(halflife=halflife, min_periods=min_periods).mean())
++
++
++def market_return(r: pd.DataFrame, eligible: pd.DataFrame) -> pd.Series:
++    """Equal-weight return of eligible assets: the 'crypto beta' factor."""
++    return r.where(eligible).mean(axis=1)
++
++
++def rolling_beta(r: pd.DataFrame, rm: pd.Series, window: int = 336) -> pd.DataFrame:
++    cov = r.mul(rm, axis=0).rolling(window, min_periods=window // 2).mean() - r.rolling(
++        window, min_periods=window // 2
++    ).mean().mul(rm.rolling(window, min_periods=window // 2).mean(), axis=0)
++    var = rm.rolling(window, min_periods=window // 2).var(ddof=0)
++    beta = cov.div(var, axis=0)
++    # shrink toward 1 (Vasicek-style): betas estimated from 2 weeks of hourly data are noisy
++    return (0.6 * beta + 0.4).clip(0.2, 3.0)
++
++
++def xs_rank(x: pd.DataFrame, eligible: pd.DataFrame) -> pd.DataFrame:
++    """Cross-sectional rank mapped to [-1, 1] among eligible assets."""
++    x = x.where(eligible)
++    rk = x.rank(axis=1)
++    n = x.notna().sum(axis=1)
++    out = rk.sub(1).div((n - 1).clip(lower=1), axis=0) * 2 - 1
++    return out[n >= 5].reindex(out.index)
++
++
++def trend_sleeve(
++    logp: pd.DataFrame, vol: pd.DataFrame, horizons=(24, 72, 168, 336), squash: float = 1.5
++) -> pd.DataFrame:
++    parts = []
++    for h in horizons:
++        z = (logp - logp.shift(h)) / (vol * np.sqrt(h))
++        parts.append(np.tanh(z / squash))
++    return sum(parts) / len(parts)
++
++
++def xsmom_sleeve(
++    resid: pd.DataFrame, eligible: pd.DataFrame, vol: pd.DataFrame, lookback: int = 168, skip: int = 6
++) -> pd.DataFrame:
++    cum = resid.rolling(lookback - skip, min_periods=(lookback - skip) // 2).sum().shift(skip)
++    z = cum / (vol * np.sqrt(lookback - skip))
++    return xs_rank(z, eligible)
++
++
++def reversal_sleeve(resid: pd.DataFrame, eligible: pd.DataFrame, vol: pd.DataFrame, lookback: int = 6) -> pd.DataFrame:
++    cum = resid.rolling(lookback, min_periods=lookback).sum()
++    z = cum / (vol * np.sqrt(lookback))
++    return -xs_rank(z, eligible)
++
++
++def trend_gate_sleeve(logp: pd.DataFrame, lookbacks=(168, 336, 720)) -> pd.DataFrame:
++    """Ensemble of slow trend gates: mean over lookbacks of sign(log return over lb).
++
++    Values in {-1, -1/3, +1/3, +1}. Averaging gates over several lookbacks instead
++    of tuning one is the robustness choice: research showed the Sharpe surface is
++    smooth across +/-25% lookback perturbations, whereas single lookbacks vary a lot.
++    """
++    return sum(np.sign(logp - logp.shift(lb)) for lb in lookbacks) / len(lookbacks)
++
++
++def trend_gate_hysteresis(
++    logp: pd.DataFrame, vol: pd.DataFrame, lookbacks=(168, 336, 720), dead_band: float = 0.25
++) -> pd.DataFrame:
++    """Same gates, but each one only switches when the vol-normalised trend
++    z = log(P_t/P_{t-lb}) / (sigma_1h * sqrt(lb)) leaves a dead band of +/-dead_band;
++    inside the band the previous state is carried (causal ffill).
++
++    Why: evaluated hourly, a gate whose trend sits near zero flips back and forth
++    every few hours, and each flip turns over a whole position (measured: 110x NAV
++    turnover vs ~10x for the same rule sampled daily). The band removes noise
++    crossings without delaying genuine trend changes by more than a few hours.
++    """
++    parts = []
++    for lb in lookbacks:
++        z = (logp - logp.shift(lb)) / (vol * np.sqrt(lb))
++        g = pd.DataFrame(
++            np.where(z > dead_band, 1.0, np.where(z < -dead_band, -1.0, np.nan)), index=z.index, columns=z.columns
++        )
++        g = g.ffill().where(z.notna()).fillna(0.0)
++        parts.append(g)
++    return sum(parts) / len(parts)
++
++
++def eligibility(
++    close: pd.DataFrame, quote_vol: pd.DataFrame, min_history: int = 24 * 30, min_daily_usd: float = 5e6
++) -> pd.DataFrame:
++    """Asset is tradeable at t if it has enough history and real liquidity."""
++    hist_ok = close.notna().astype(int).rolling(min_history, min_periods=1).sum() >= min_history
++    adv = quote_vol.rolling(24 * 14, min_periods=24 * 7).sum() / 14
++    return hist_ok & (adv >= min_daily_usd) & close.notna()
+diff --git a/sigma_config.json b/sigma_config.json
+new file mode 100644
+index 0000000..f7565e2
+--- /dev/null
++++ b/sigma_config.json
+@@ -0,0 +1,63 @@
++{
++  "name": "combined-conservative",
++  "pairs": [
++    "BTC/USD",
++    "ETH/USD",
++    "SOL/USD",
++    "BNB/USD",
++    "XRP/USD"
++  ],
++  "gate_lookbacks": [
++    126,
++    252,
++    540
++  ],
++  "dead_band": 0.5,
++  "vol_halflife": 72,
++  "fast_vol_halflife": 12,
++  "warmup_hours": 720,
++  "min_daily_volume": 1000000,
++  "gate_min": 0.3,
++  "short_scale": 0.5,
++  "allow_shorts": true,
++  "target_vol": 0.2,
++  "gross_cap": 0.95,
++  "major_cap": 0.4,
++  "other_cap": 0.3,
++  "cov_window": 336,
++  "cov_shrink": 0.3,
++  "shock_guard": true,
++  "signed_covariance": false,
++  "sizing_hours": 6,
++  "sizing_phase": 0,
++  "dd_soft": 0.03,
++  "dd_hard": 0.1,
++  "dd_floor": 0.25,
++  "band_abs": 0.03,
++  "band_rel": 0.2,
++  "min_trade_usd": 50,
++  "maker_fee": 0.0005,
++  "taker_fee": 0.001,
++  "maker_patience_seconds": 3600,
++  "passive_through_bps": 2,
++  "slippage_bps": 1,
++  "max_order_fraction": 0.25,
++  "probe_total_usd": 100,
++  "daily_profit": 0.0035,
++  "total_profit": 0.011,
++  "daily_loss": 0.0075,
++  "total_loss": 0.025,
++  "max_drawdown": 0.025,
++  "max_consecutive_losses": 3,
++  "runtime_dir": "runtime",
++  "data_dir": "data/sigma",
++  "base_url": "https://mock-api.roostoo.com",
++  "data_base_url": "https://data-api.binance.vision",
++  "spacing": 2.2,
++  "poll_seconds": 30,
++  "competition_start": "2026-10-04T12:00:00Z",
++  "competition_end": "2026-10-18T00:00:00+08:00",
++  "fixed_long": 0,
++  "fixed_floor": -0.042,
++  "fixed_goal": 0.0025
++}
+diff --git a/sigma_reference_config.json b/sigma_reference_config.json
+new file mode 100644
+index 0000000..44a6d50
+--- /dev/null
++++ b/sigma_reference_config.json
+@@ -0,0 +1,63 @@
++{
++  "name": "sigma-reference-corrected",
++  "pairs": [
++    "BTC/USD",
++    "ETH/USD",
++    "SOL/USD",
++    "BNB/USD",
++    "XRP/USD"
++  ],
++  "gate_lookbacks": [
++    168,
++    336,
++    720
++  ],
++  "dead_band": 0.5,
++  "vol_halflife": 72,
++  "fast_vol_halflife": 12,
++  "warmup_hours": 720,
++  "min_daily_volume": 1000000,
++  "gate_min": 0.3,
++  "short_scale": 0.5,
++  "allow_shorts": true,
++  "target_vol": 0.3,
++  "gross_cap": 0.95,
++  "major_cap": 0.4,
++  "other_cap": 0.3,
++  "cov_window": 336,
++  "cov_shrink": 0.3,
++  "shock_guard": false,
++  "signed_covariance": false,
++  "sizing_hours": 1,
++  "sizing_phase": 0,
++  "dd_soft": 0.03,
++  "dd_hard": 0.1,
++  "dd_floor": 0.25,
++  "band_abs": 0.03,
++  "band_rel": 0.2,
++  "min_trade_usd": 50,
++  "maker_fee": 0.0005,
++  "taker_fee": 0.001,
++  "maker_patience_seconds": 3600,
++  "passive_through_bps": 2,
++  "slippage_bps": 1,
++  "max_order_fraction": 0.25,
++  "probe_total_usd": 100,
++  "daily_profit": 0.0035,
++  "total_profit": 0.011,
++  "daily_loss": 0.0075,
++  "total_loss": 0.025,
++  "max_drawdown": 0.025,
++  "max_consecutive_losses": 3,
++  "runtime_dir": "runtime",
++  "data_dir": "data/sigma",
++  "base_url": "https://mock-api.roostoo.com",
++  "data_base_url": "https://data-api.binance.vision",
++  "spacing": 2.2,
++  "poll_seconds": 30,
++  "competition_start": "2026-10-04T12:00:00Z",
++  "competition_end": "2026-10-18T00:00:00+08:00",
++  "fixed_long": 0,
++  "fixed_floor": -0.042,
++  "fixed_goal": 0.0025
++}
+diff --git a/sigma_shorter_research_config.json b/sigma_shorter_research_config.json
+new file mode 100644
+index 0000000..e7a505d
+--- /dev/null
++++ b/sigma_shorter_research_config.json
+@@ -0,0 +1,63 @@
++{
++  "name": "shorter-gates",
++  "pairs": [
++    "BTC/USD",
++    "ETH/USD",
++    "SOL/USD",
++    "BNB/USD",
++    "XRP/USD"
++  ],
++  "gate_lookbacks": [
++    126,
++    252,
++    540
++  ],
++  "dead_band": 0.5,
++  "vol_halflife": 72,
++  "fast_vol_halflife": 12,
++  "warmup_hours": 720,
++  "min_daily_volume": 1000000,
++  "gate_min": 0.3,
++  "short_scale": 0.5,
++  "allow_shorts": true,
++  "target_vol": 0.3,
++  "gross_cap": 0.95,
++  "major_cap": 0.4,
++  "other_cap": 0.3,
++  "cov_window": 336,
++  "cov_shrink": 0.3,
++  "shock_guard": false,
++  "signed_covariance": false,
++  "sizing_hours": 1,
++  "sizing_phase": 0,
++  "dd_soft": 0.03,
++  "dd_hard": 0.1,
++  "dd_floor": 0.25,
++  "band_abs": 0.03,
++  "band_rel": 0.2,
++  "min_trade_usd": 50,
++  "maker_fee": 0.0005,
++  "taker_fee": 0.001,
++  "maker_patience_seconds": 3600,
++  "passive_through_bps": 2,
++  "slippage_bps": 1,
++  "max_order_fraction": 0.25,
++  "probe_total_usd": 100,
++  "daily_profit": 0.0035,
++  "total_profit": 0.011,
++  "daily_loss": 0.0075,
++  "total_loss": 0.025,
++  "max_drawdown": 0.025,
++  "max_consecutive_losses": 3,
++  "runtime_dir": "runtime",
++  "data_dir": "data/sigma",
++  "base_url": "https://mock-api.roostoo.com",
++  "data_base_url": "https://data-api.binance.vision",
++  "spacing": 2.2,
++  "poll_seconds": 30,
++  "competition_start": "2026-10-04T12:00:00Z",
++  "competition_end": "2026-10-18T00:00:00+08:00",
++  "fixed_long": 0,
++  "fixed_floor": -0.042,
++  "fixed_goal": 0.0025
++}
+diff --git a/tests/test_critical_behavior.py b/tests/test_critical_behavior.py
+index 2f3f9be..ad9d948 100644
+--- a/tests/test_critical_behavior.py
++++ b/tests/test_critical_behavior.py
+@@ -17,7 +17,7 @@ import pandas as pd
+ 
+ from sentinel.api import AmbiguousWrite, ApiError, Roostoo, decimal_string, signature
+ from sentinel.config import Config
+-from sentinel.data import HOUR, normalize_frame, validate_frame
++from sentinel.data import HOUR, normalize_frame, validate_frame, read_bars
+ from sentinel.execution import Executor
+ from sentinel.research import Outcome, calibration, evidence, exit_bar, label_setups, net_return
+ from sentinel.risk import Position, allocation, loss_breach
+@@ -34,6 +34,13 @@ def candles(n=400):
+ 
+ 
+ class SignalAndDataTests(unittest.TestCase):
++    def test_compressed_bundle_preserves_exact_candle_history(self):
++        with tempfile.TemporaryDirectory() as td:
++            original=candles(3)
++            original.to_csv(Path(td)/'BTC_USD.csv.gz',index=False,compression='gzip')
++            restored=read_bars(td,'BTC/USD')
++            pd.testing.assert_frame_equal(original,restored,check_exact=False,rtol=1e-14)
++
+     def test_future_candles_cannot_change_past_features(self):
+         data = candles()
+         past = features(data.iloc[:320].copy())
+diff --git a/tests/test_sigma.py b/tests/test_sigma.py
+new file mode 100644
+index 0000000..5fbd7a0
+--- /dev/null
++++ b/tests/test_sigma.py
+@@ -0,0 +1,104 @@
++import unittest
++from dataclasses import replace
++
++import numpy as np
++import pandas as pd
++
++from sentinel.data import HOUR
++from sentinel.sigma import PAIRS,SigmaConfig,apply_caps,prepare,target_weights
++from sentinel.sigma_backtest import run
++
++
++def bars(n=1000):
++    rng=np.random.default_rng(81)
++    out={}
++    for j,p in enumerate(PAIRS):
++        close=(100+j*10)*np.exp(np.cumsum(rng.normal(.0002,.002,n)))
++        out[p]=pd.DataFrame({'timestamp':np.arange(n,dtype=np.int64)*HOUR+1640995200000,'open':close,'high':close*1.003,'low':close*.997,'close':close,'volume':np.full(n,1e5),'quote_volume':np.full(n,2e7)})
++    return out
++
++
++class SigmaTests(unittest.TestCase):
++    def test_future_candles_do_not_change_features(self):
++        b=bars(1050);cfg=SigmaConfig()
++        short=prepare({p:d.iloc[:1000] for p,d in b.items()},cfg)
++        full=prepare(b,cfg)
++        np.testing.assert_allclose(short.score,full.score[:1000],equal_nan=True)
++        np.testing.assert_allclose(short.covariance,full.covariance[:1000],equal_nan=True)
++        np.testing.assert_allclose(short.slow_vol,full.slow_vol[:1000],equal_nan=True)
++
++    def test_availability_after_close(self):
++        b=bars();f=prepare(b,SigmaConfig())
++        self.assertEqual(f.index[0].value//1_000_000,int(b[PAIRS[0]].timestamp.iloc[0])+HOUR)
++
++    def test_misaligned_assets_rejected(self):
++        b=bars();b[PAIRS[-1]]=b[PAIRS[-1]].iloc[1:]
++        with self.assertRaises(ValueError):prepare(b,SigmaConfig())
++
++    def test_real_gap_resets_warmup_without_inventing_bar(self):
++        b={p:d.drop(index=800).reset_index(drop=True) for p,d in bars(1700).items()}
++        f=prepare(b,SigmaConfig())
++        self.assertEqual(len(f.index),1699)
++        self.assertFalse(f.eligible[800:1520].any())
++
++    def test_post_band_caps(self):
++        cfg=SigmaConfig()
++        w=apply_caps([.5,.5,.3,.3,.3],cfg)
++        self.assertLessEqual(np.abs(w).sum(),.95+1e-12)
++        self.assertLessEqual(w[0],.4)
++        self.assertLessEqual(w[-1],.3)
++
++    def test_weak_gate_is_cash(self):
++        cfg=replace(SigmaConfig(),gate_min=2/3)
++        f=prepare(bars(),cfg);f.score[900]=1/3
++        w,_=target_weights(f,900,np.zeros(5),1e5,{},cfg)
++        np.testing.assert_allclose(w,0)
++
++    def test_disabled_shorts_never_open_negative(self):
++        cfg=replace(SigmaConfig(),allow_shorts=False)
++        f=prepare(bars(),cfg);f.score[900]=-1
++        w,_=target_weights(f,900,np.zeros(5),1e5,{},cfg)
++        self.assertTrue((w>=0).all())
++
++    def test_side_change_processed_between_sizing_hours(self):
++        cfg=replace(SigmaConfig(),sizing_hours=6,sizing_phase=1)
++        f=prepare(bars(),cfg);f.score[900]=-1
++        w,_=target_weights(f,900,np.full(5,.1),1e5,{},cfg)
++        self.assertTrue((w<0).all())
++
++    def test_constant_price_pays_fees(self):
++        cfg=SigmaConfig()
++        f=prepare(bars(),cfg);f.open[:]=f.close[:]=100;f.high[:]=101;f.low[:]=99;f.score[:]=1
++        r=run(f,cfg,f.index[800],f.index[900],'all_taker')
++        self.assertLess(r.summary['return'],0)
++        self.assertGreater(r.summary['fees_usd'],0)
++        self.assertTrue((pd.to_datetime(r.trades.timestamp,utc=True)>=f.index[800]).all())
++
++    def test_short_proceeds_cannot_fund_extra_exposure(self):
++        cfg=SigmaConfig()
++        f=prepare(bars(),cfg);f.open[:]=f.close[:]=100;f.high[:]=101;f.low[:]=99;f.score[:]=-1
++        r=run(f,cfg,f.index[800],f.index[900],'all_taker')
++        self.assertGreaterEqual(r.diagnostics.cash_free_proxy.min(),-1e-6)
++        self.assertLess(r.summary['return'],0)
++
++    def test_double_cost_is_worse_in_constant_market(self):
++        cfg=SigmaConfig();f=prepare(bars(),cfg);f.open[:]=f.close[:]=100;f.high[:]=101;f.low[:]=99;f.score[:]=1
++        normal=run(f,cfg,f.index[800],f.index[900],'all_taker')
++        stress=run(f,cfg,f.index[800],f.index[900],'double_cost')
++        self.assertLess(stress.summary['return'],normal.summary['return'])
++
++    def test_fixed_profit_lock_sticky(self):
++        cfg=replace(SigmaConfig(),fixed_long=.9)
++        f=prepare(bars(),cfg);s={'initial_nav':1e5}
++        w,_=target_weights(f,900,np.zeros(5),100300,s,cfg)
++        np.testing.assert_allclose(w,0)
++        self.assertEqual(s['fixed_lock'],'goal')
++        w,_=target_weights(f,901,np.zeros(5),99900,s,cfg)
++        np.testing.assert_allclose(w,0)
++
++    def test_config_rejects_leverage_and_unknown_fields(self):
++        with self.assertRaises(ValueError):replace(SigmaConfig(),gross_cap=1.2)
++        with self.assertRaises(ValueError):replace(SigmaConfig(),sizing_hours=0)
++
++
++if __name__=='__main__':unittest.main()
+diff --git a/tests/test_sigma_live.py b/tests/test_sigma_live.py
+new file mode 100644
+index 0000000..4e1948e
+--- /dev/null
++++ b/tests/test_sigma_live.py
+@@ -0,0 +1,130 @@
++import tempfile
++from pathlib import Path
++import unittest
++from unittest.mock import Mock
++
++import numpy as np
++
++from sentinel.api import ApiError,Roostoo
++from sentinel.sigma import PAIRS,SigmaConfig
++from sentinel.sigma_live import account_snapshot,normalize_order,risk_reason,SigmaRunner
++from sentinel.state import Store
++
++
++def ticker():return {'Data':{p:{'MaxBid':100,'MinAsk':100} for p in PAIRS}}
++
++
++class SigmaLiveTests(unittest.TestCase):
++    def test_pending_echo_is_not_fill(self):
++        o={'Quantity':2,'FilledQuantity':2,'FilledAverPrice':0,'CommissionChargeValue':0,'CoinChange':0,'UnitChange':0,'Status':'PENDING'}
++        self.assertEqual(normalize_order(o,0,0)['FilledQuantity'],0)
++        with self.assertRaises(ApiError):normalize_order(o,0,1)
++
++    def test_actual_partial_fill_preserved(self):
++        o={'Quantity':2,'FilledQuantity':1,'FilledAverPrice':100,'CommissionChargeValue':.05,'CoinChange':1,'UnitChange':-100.05}
++        self.assertEqual(normalize_order(o,0,1)['FilledQuantity'],1)
++
++    def test_invalid_overfill_rejected(self):
++        o={'Quantity':2,'FilledQuantity':3,'FilledAverPrice':100,'CommissionChargeValue':.05}
++        with self.assertRaises(ApiError):normalize_order(o,0,3)
++
++    def test_collateral_not_double_counted(self):
++        a={'spot':{'USD':{'Free':80,'Lock':20}},'margin':{}}
++        s=[{'Pair':PAIRS[0],'Collateral':20,'ShortQty':.2,'EntryPrice':100}]
++        t=ticker();t['Data'][PAIRS[0]]['MinAsk']=105
++        nav,free,qty,values=account_snapshot(a,s,t,SigmaConfig())
++        self.assertAlmostEqual(nav,98.979)
++        self.assertEqual(qty[0],-.2)
++
++    def test_missing_collateral_lock_rejected(self):
++        a={'spot':{'USD':{'Free':100,'Lock':0}},'margin':{}}
++        with self.assertRaises(ApiError):account_snapshot(a,[{'Pair':PAIRS[0],'Collateral':20,'ShortQty':.2,'EntryPrice':100}],ticker(),SigmaConfig())
++
++    def test_funded_margin_wallet_not_assumed_spot(self):
++        a={'spot':{'USD':{'Free':100,'Lock':0}},'margin':{'USD':{'Free':1,'Lock':0}}}
++        with self.assertRaises(ApiError):account_snapshot(a,[],ticker(),SigmaConfig())
++
++    def test_foreign_holdings_rejected(self):
++        a={'spot':{'USD':{'Free':100,'Lock':0},'PEPE':{'Free':1,'Lock':0}},'margin':{}}
++        with self.assertRaises(ApiError):account_snapshot(a,[],ticker(),SigmaConfig())
++
++    def test_permanent_halt_survives_day_change(self):
++        cfg=SigmaConfig();r={}
++        risk_reason(100,1791590400000,r,cfg)
++        self.assertEqual(risk_reason(97,1791590500000,r,cfg),'total_loss')
++        self.assertEqual(risk_reason(100,1791763300000,r,cfg),'total_loss')
++
++    def test_profit_stop_is_persistent(self):
++        cfg=SigmaConfig();r={}
++        risk_reason(100,1791590400000,r,cfg)
++        self.assertEqual(risk_reason(101.2,1791590500000,r,cfg),'total_profit')
++        self.assertEqual(risk_reason(100,1791763300000,r,cfg),'total_profit')
++
++    def test_three_losses_block(self):
++        cfg=SigmaConfig();r={}
++        risk_reason(100,1791590400000,r,cfg);r['consecutive_losses']=3
++        self.assertEqual(risk_reason(100,1791590500000,r,cfg),'consecutive_losses')
++
++    def test_zero_fill_cancellation_does_not_reset_losses(self):
++        with tempfile.TemporaryDirectory() as td:
++            runner=SigmaRunner.__new__(SigmaRunner)
++            runner.cfg=SigmaConfig();runner.store=Store(Path(td)/'test.sqlite3')
++            runner.meta={p:{'AmountPrecision':5} for p in PAIRS};runner.owned=[0.]*5
++            runner.risk={'consecutive_losses':2};runner.api=Roostoo()
++            key=runner.store.intent('x',{'pair':PAIRS[0],'before_qty':0},100)
++            runner._finish({'id':key,'payload':{'pair':PAIRS[0],'before_qty':0}},{'quantity':0,'order':{'FilledAverPrice':0}},0)
++            self.assertEqual(runner.risk['consecutive_losses'],2)
++            self.assertEqual(runner.store.fills(),[])
++            runner.store.close()
++
++    def test_short_close_quantity_is_reduce_only_parameter(self):
++        class Capture(Roostoo):
++            def _request(self,*args,**kwargs):return args,kwargs
++        api=Capture();args,kwargs=api.short_close(PAIRS[0],'0.01')
++        self.assertEqual(args[2],{'pair':PAIRS[0],'close_qty':'0.01'})
++        self.assertTrue(kwargs['mutation'])
++        with self.assertRaises(ValueError):api.short_close(PAIRS[0],'-1')
++
++    def test_expired_session_cannot_journal_or_send_an_entry(self):
++        runner=SigmaRunner.__new__(SigmaRunner)
++        runner.session={'deadline_ms':100,'stopping':False}
++        runner.stop_requested=False
++        runner.api=Mock();runner.api.now_ms.return_value=101
++        runner.store=Mock()
++        runner.submit(PAIRS[0],'SHORT_OPEN',1,None,'allocation',{},np.zeros(5),100,100)
++        self.assertTrue(runner.session['stopping'])
++        runner.store.intent.assert_not_called()
++        runner.api.short_open.assert_not_called()
++
++    def test_short_merge_uses_exchange_weighted_entry_once(self):
++        with tempfile.TemporaryDirectory() as td:
++            runner=SigmaRunner.__new__(SigmaRunner)
++            runner.cfg=SigmaConfig();runner.store=Store(Path(td)/'test.sqlite3')
++            runner.meta={p:{'AmountPrecision':5} for p in PAIRS};runner.owned=[-1.,0,0,0,0]
++            runner.risk={};runner.api=Roostoo()
++            runner.store.set('sigma_cost_basis',{PAIRS[0]:{'basis':100.,'realized':-.1}})
++            payload={'pair':PAIRS[0],'side':'SHORT_OPEN','before_qty':-1}
++            key=runner.store.intent('merge',payload,100)
++            runner._finish({'id':key,'payload':payload},{'quantity':1,'response':{'EntryPrice':150,'OpenFee':.2}},-2)
++            book=runner.store.get('sigma_cost_basis',{})[PAIRS[0]]
++            self.assertEqual(book['basis'],150)
++            self.assertAlmostEqual(book['realized'],-.3)
++            runner.store.close()
++
++    def test_short_close_uses_capped_exchange_realized_loss(self):
++        with tempfile.TemporaryDirectory() as td:
++            runner=SigmaRunner.__new__(SigmaRunner)
++            runner.cfg=SigmaConfig();runner.store=Store(Path(td)/'test.sqlite3')
++            runner.meta={p:{'AmountPrecision':5} for p in PAIRS};runner.owned=[-1.,0,0,0,0]
++            runner.risk={};runner.api=Roostoo()
++            runner.store.set('sigma_cost_basis',{PAIRS[0]:{'basis':100.,'realized':-.1}})
++            payload={'pair':PAIRS[0],'side':'SHORT_CLOSE','before_qty':-1}
++            key=runner.store.intent('close',payload,100)
++            fill={'quantity':1,'response':{'ClosePrice':250,'RealizedPNL':-100,'CloseFee':.25}}
++            runner._finish({'id':key,'payload':payload},fill,0)
++            self.assertAlmostEqual(fill['closed_or_dust_position_net_pnl'],-100.35)
++            self.assertEqual(runner.risk['consecutive_losses'],1)
++            runner.store.close()
++
++
++if __name__=='__main__':unittest.main()

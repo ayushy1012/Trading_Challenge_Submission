@@ -1,0 +1,20 @@
+{
+  "return": 0.14260235198968552,
+  "sharpe": 0.9107889146335384,
+  "sortino": 1.2884163756219988,
+  "max_drawdown": 0.11056887039224494,
+  "fees_usd": 2331.003836660092,
+  "turnover_nav": 31.413234320009934,
+  "maker_share": 0.5159096876724563,
+  "trades": 651,
+  "hours": 8760,
+  "model": "passive",
+  "config_hash": "4f615d29f68f3d827ee534e877c6630c66a33465486a95207a0a1afa152b6a9b",
+  "competition_stops": false,
+  "halt_events": [],
+  "initial_usd": 100000.0,
+  "start": "2024-12-31 23:00:00+00:00",
+  "end": "2025-12-31 23:00:00+00:00",
+  "source": "historical_simulation",
+  "hourly_stop_resolution": true
+}

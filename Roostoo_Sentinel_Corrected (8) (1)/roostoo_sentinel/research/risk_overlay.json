@@ -1,0 +1,100 @@
+{
+  "execution_backtest": false,
+  "authenticated_account_results": false,
+  "caveat": "Conditional overlay of archived simulated entry/exit returns, not measured performance of the best-bid execution policy. No intratrade marks, prospective holdout, latency, executable spread, partial fills or new signal generation. Skipping trades changes the real future signal sequence; this replay cannot reproduce that effect.",
+  "config": {
+    "pairs": [
+      "PEPE/USD"
+    ],
+    "maker_fee": 0.0005,
+    "taker_fee": 0.001,
+    "min_cycle_net_bps": 6.0,
+    "target_ticks": 1,
+    "entry_behind_bid_ticks": 0,
+    "max_spread_ticks": 2,
+    "stop_ticks": 3,
+    "entry_ttl_seconds": 600,
+    "max_hold_seconds": 1800,
+    "cooldown_seconds": 180,
+    "min_entry_interval_seconds": 300,
+    "poll_seconds": 30,
+    "max_cycles_per_day": 24,
+    "max_entry_attempts_per_day": 48,
+    "rejection_backoff_seconds": 300,
+    "report_interval_seconds": 60,
+    "allocation_cap": 0.15,
+    "planned_risk": 0.0015,
+    "daily_loss": 0.0075,
+    "max_drawdown": 0.025,
+    "max_total_loss": 0.025,
+    "daily_profit_target": 0.0035,
+    "total_profit_target": 0.011,
+    "max_consecutive_losses": 3,
+    "exit_slippage_ticks": 1,
+    "min_daily_volume": 2000000.0,
+    "minimum_notional": 10.0,
+    "shadow_initial_cash": 100000.0,
+    "shadow_fill_reference": "quotes",
+    "probe_notional": 100.0,
+    "probe_cycles": 20,
+    "probe_min_win_rate": 0.8,
+    "probe_win_rate_margin": 0.02,
+    "probe_max_cycles": 60,
+    "runtime_dir": "runtime",
+    "competition_start": "2026-10-04T00:00:00+08:00",
+    "competition_end": "2026-10-18T00:00:00+08:00",
+    "tick_permission_basis": "User clarification: sequential tick scalping is permitted."
+  },
+  "streams": [
+    {
+      "source": "research/limit_research/PEPE_touch_trades.csv",
+      "source_sha256": "5ede63632d729dc804f70ee0d786ecb28da2021acfb8f498078421c9866c44f3",
+      "source_simulated_cycles": 912,
+      "accepted_cycles": 88,
+      "probe_cycles": 25,
+      "larger_cycles": 63,
+      "skipped_cycles_by_first_reason": {
+        "daily_profit_target": 15,
+        "total_profit_target": 809
+      },
+      "conditional_cash_return": 0.01106871163588763,
+      "conditional_cash_pnl_usd": 1106.871163588774,
+      "final_halt_reasons": [
+        "total_profit_target"
+      ]
+    },
+    {
+      "source": "research/limit_research/PEPE_sampled_trades.csv",
+      "source_sha256": "4212f4aa4e7a4c5aedbca35af676f5b64cb0055b61a71f4474806eeb26479e67",
+      "source_simulated_cycles": 637,
+      "accepted_cycles": 29,
+      "probe_cycles": 29,
+      "larger_cycles": 0,
+      "skipped_cycles_by_first_reason": {
+        "profitability_check_failed": 608
+      },
+      "conditional_cash_return": -3.4699614362976305e-06,
+      "conditional_cash_pnl_usd": -0.3469961436348967,
+      "final_halt_reasons": [
+        "profitability_check_failed"
+      ]
+    },
+    {
+      "source": "research/limit_research/PEPE_through_trades.csv",
+      "source_sha256": "57843be1a4b921b26ed0b3e80566b2531791b0970dd12b5f2d03d1b34249809f",
+      "source_simulated_cycles": 46,
+      "accepted_cycles": 20,
+      "probe_cycles": 20,
+      "larger_cycles": 0,
+      "skipped_cycles_by_first_reason": {
+        "consecutive_loss_limit": 23,
+        "profitability_check_failed": 3
+      },
+      "conditional_cash_return": -0.00011561880561161697,
+      "conditional_cash_pnl_usd": -11.561880561159342,
+      "final_halt_reasons": [
+        "profitability_check_failed"
+      ]
+    }
+  ]
+}

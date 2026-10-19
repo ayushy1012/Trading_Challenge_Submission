@@ -1,0 +1,104 @@
+{
+  "read_only": true,
+  "timestamp_ms": 1791634108258,
+  "accounts": {
+    "spot": {
+      "BNB": {
+        "Free": 0.0,
+        "Lock": 0.0
+      },
+      "PEPE": {
+        "Free": 0.0,
+        "Lock": 0.0
+      },
+      "USD": {
+        "Free": 49999.87,
+        "Lock": 0.0
+      }
+    },
+    "margin": {},
+    "schema": "SpotWallet"
+  },
+  "pending_orders": [],
+  "owned_orders": {
+    "3450952": [
+      {
+        "Pair": "PEPE/USD",
+        "OrderID": 3450952,
+        "Status": "CANCELED",
+        "Role": "MAKER",
+        "ServerTimeUsage": 0.005912873,
+        "CreateTimestamp": 1791632995962,
+        "FinishTimestamp": 1791633581127,
+        "Side": "BUY",
+        "Type": "LIMIT",
+        "StopType": "GTC",
+        "Price": 4.02e-06,
+        "Quantity": 24875621,
+        "FilledQuantity": 24875621,
+        "FilledAverPrice": 0,
+        "CoinChange": 0,
+        "UnitChange": 0,
+        "CommissionCoin": "PEPE",
+        "CommissionChargeValue": 0,
+        "CommissionPercent": 0.0005,
+        "OrderWalletType": "SPOT",
+        "OrderSource": "PUBLIC_API"
+      }
+    ],
+    "3450990": [
+      {
+        "Pair": "PEPE/USD",
+        "OrderID": 3450990,
+        "Status": "FILLED",
+        "Role": "TAKER",
+        "ServerTimeUsage": 0.004337051,
+        "CreateTimestamp": 1791633833042,
+        "FinishTimestamp": 1791633833046,
+        "Side": "BUY",
+        "Type": "LIMIT",
+        "StopType": "GTC",
+        "Price": 4.03e-06,
+        "Quantity": 4962000,
+        "FilledQuantity": 4962000,
+        "FilledAverPrice": 4.03e-06,
+        "CoinChange": 4962000,
+        "UnitChange": 19.99686,
+        "CommissionCoin": "USD",
+        "CommissionChargeValue": 0.019996,
+        "CommissionPercent": 0.001,
+        "OrderWalletType": "SPOT",
+        "OrderSource": "PUBLIC_API"
+      }
+    ],
+    "3450997": [
+      {
+        "Pair": "PEPE/USD",
+        "OrderID": 3450997,
+        "Status": "FILLED",
+        "Role": "TAKER",
+        "ServerTimeUsage": 0.003823392,
+        "CreateTimestamp": 1791633881550,
+        "FinishTimestamp": 1791633881554,
+        "Side": "SELL",
+        "Type": "LIMIT",
+        "StopType": "GTC",
+        "Price": 4.02e-06,
+        "Quantity": 4962000,
+        "FilledQuantity": 4962000,
+        "FilledAverPrice": 4.02e-06,
+        "CoinChange": 4962000,
+        "UnitChange": 19.947239,
+        "CommissionCoin": "USD",
+        "CommissionChargeValue": 0.019947,
+        "CommissionPercent": 0.001,
+        "OrderWalletType": "SPOT",
+        "OrderSource": "PUBLIC_API"
+      }
+    ]
+  },
+  "short_response": {
+    "Success": true,
+    "Positions": []
+  }
+}

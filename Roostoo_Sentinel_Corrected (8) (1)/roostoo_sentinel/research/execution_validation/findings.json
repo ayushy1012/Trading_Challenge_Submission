@@ -1,0 +1,12 @@
+{
+  "measured_profitable_passive_cycles": 0,
+  "actual_test_orders": 3,
+  "actual_filled_test_orders": 2,
+  "actual_test_cash_change_usd": -0.09,
+  "development_runs": 117,
+  "new_day_checks": 81,
+  "policies_profitable_across_all_three_fill_models": 0,
+  "recommended_status": "Unproven candidate; $100 cap until actual conservative evidence passes; no 1% guarantee",
+  "credentials_in_package": false,
+  "runtime_journals_in_package": false
+}

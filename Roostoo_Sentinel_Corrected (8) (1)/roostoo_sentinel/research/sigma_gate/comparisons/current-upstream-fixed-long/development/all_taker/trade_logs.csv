@@ -1,0 +1,11 @@
+timestamp,pair,quantity_delta,price,role,fee_usd,reason,source,model
+2022-03-01T00:00:00+00:00,BTC/USD,0.46752000000000005,43164.320999999996,TAKER,20.18018335392,next_open,historical_simulation,all_taker
+2022-03-01T00:00:00+00:00,ETH/USD,5.6303,2921.127083,TAKER,16.4468218154149,next_open,historical_simulation,all_taker
+2022-03-01T00:00:00+00:00,SOL/USD,143.56900000000002,99.684967,TAKER,14.311671027223001,next_open,historical_simulation,all_taker
+2022-03-01T00:00:00+00:00,BNB/USD,56.189,395.74457,TAKER,22.23649164373,next_open,historical_simulation,all_taker
+2022-03-01T00:00:00+00:00,XRP/USD,21559.4,0.78102809,TAKER,16.838497003546,next_open,historical_simulation,all_taker
+2022-03-01T08:00:00+00:00,BTC/USD,-0.46752000000000005,43488.605704,TAKER,20.331792938734083,risk_exit,historical_simulation,all_taker
+2022-03-01T08:00:00+00:00,ETH/USD,-5.6303,2921.642806,TAKER,16.449725490621802,risk_exit,historical_simulation,all_taker
+2022-03-01T08:00:00+00:00,SOL/USD,-143.56900000000002,96.945304,TAKER,13.918340349976,risk_exit,historical_simulation,all_taker
+2022-03-01T08:00:00+00:00,BNB/USD,-56.189,413.15368,TAKER,23.21469212552,risk_exit,historical_simulation,all_taker
+2022-03-01T08:00:00+00:00,XRP/USD,-21559.4,0.7717728100000001,TAKER,16.638958719914005,risk_exit,historical_simulation,all_taker

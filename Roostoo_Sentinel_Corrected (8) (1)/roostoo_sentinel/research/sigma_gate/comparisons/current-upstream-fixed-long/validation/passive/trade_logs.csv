@@ -1,0 +1,11 @@
+timestamp,pair,quantity_delta,price,role,fee_usd,reason,source,model
+2025-01-01T01:00:00+00:00,BTC/USD,0.24721,93575.99,MAKER,11.56646024395,trade_through_proxy,historical_simulation,passive
+2025-01-01T01:00:00+00:00,ETH/USD,5.558400000000001,3337.77,MAKER,9.276330384000001,trade_through_proxy,historical_simulation,passive
+2025-01-01T01:00:00+00:00,SOL/USD,75.622,189.3,MAKER,7.1576223,trade_through_proxy,historical_simulation,passive
+2025-01-01T01:00:00+00:00,BNB/USD,29.919,702.29,MAKER,10.505907255,trade_through_proxy,historical_simulation,passive
+2025-01-01T01:00:00+00:00,XRP/USD,6232.200000000001,2.0835,MAKER,6.4923943500000005,trade_through_proxy,historical_simulation,passive
+2025-01-01T01:00:00+00:00,BTC/USD,-0.24721,94391.68488700001,TAKER,23.334568420915275,risk_exit,historical_simulation,passive
+2025-01-01T01:00:00+00:00,ETH/USD,-5.558400000000001,3363.3486310000003,TAKER,18.694837030550403,risk_exit,historical_simulation,passive
+2025-01-01T01:00:00+00:00,SOL/USD,-75.622,192.51574599999998,TAKER,14.558425744011998,risk_exit,historical_simulation,passive
+2025-01-01T01:00:00+00:00,BNB/USD,-29.919,709.034089,TAKER,21.213590908791,risk_exit,historical_simulation,passive
+2025-01-01T01:00:00+00:00,XRP/USD,-6232.200000000001,2.11033894,TAKER,13.152054341868004,risk_exit,historical_simulation,passive

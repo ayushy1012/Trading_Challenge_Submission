@@ -1,0 +1,48 @@
+{
+  "source": "historical_simulation",
+  "method": "1000 paired moving-block resamples of frozen 2026 hourly net-return series; wrapping at sample end",
+  "selection_trials": 9,
+  "not_independent_of_upstream_research": true,
+  "results": {
+    "48": {
+      "sigma-reference-corrected": {
+        "sharpe_ci90": [
+          -1.3586193981065304,
+          2.668564560732875
+        ],
+        "bootstrap_fraction_sharpe_positive": 0.704
+      },
+      "combined-conservative": {
+        "sharpe_ci90": [
+          -1.0609832259265053,
+          3.029892959308986
+        ],
+        "bootstrap_fraction_sharpe_positive": 0.789
+      },
+      "paired_sharpe_improvement_ci90": [
+        -0.40977039023426565,
+        1.1622079167273223
+      ]
+    },
+    "168": {
+      "sigma-reference-corrected": {
+        "sharpe_ci90": [
+          -1.6202276529291055,
+          2.827895782905787
+        ],
+        "bootstrap_fraction_sharpe_positive": 0.664
+      },
+      "combined-conservative": {
+        "sharpe_ci90": [
+          -1.2574143862353209,
+          3.2803369285051653
+        ],
+        "bootstrap_fraction_sharpe_positive": 0.755
+      },
+      "paired_sharpe_improvement_ci90": [
+        -0.382305665872322,
+        1.1103179035436836
+      ]
+    }
+  }
+}

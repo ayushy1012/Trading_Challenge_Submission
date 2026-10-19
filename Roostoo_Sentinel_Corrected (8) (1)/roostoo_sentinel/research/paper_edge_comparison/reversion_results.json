@@ -1,0 +1,628 @@
+{
+  "registration": {
+    "filters": [
+      "mean_discount",
+      "floor_bounce",
+      "stationary_floor"
+    ],
+    "entry_offsets": [
+      1,
+      2
+    ],
+    "target_ticks": [
+      1,
+      2
+    ],
+    "fill_models": [
+      "touch",
+      "sampled",
+      "through"
+    ],
+    "stop_ticks": 3,
+    "ttl_minutes": 15,
+    "hold_minutes": 30,
+    "caveat": "Exploratory additional tests on reused history; no untouched holdout, no Roostoo fills."
+  },
+  "ranked": [
+    {
+      "filter": "mean_discount",
+      "entry_offset": 2,
+      "target_ticks": 1,
+      "models": {
+        "touch": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.012824107379524774,
+          "max_drawdown": -0.0018969522586608223,
+          "trades": 90,
+          "win_rate": 0.9666666666666667,
+          "profit_factor": 3.836537681105435,
+          "active_utc_days": 31,
+          "halts": false,
+          "target_exits": 87,
+          "mean_pnl": 14.24900819947168
+        },
+        "sampled": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.0044916000673151935,
+          "max_drawdown": -0.009193880776837582,
+          "trades": 63,
+          "win_rate": 0.8412698412698413,
+          "profit_factor": 0.7003383134896873,
+          "active_utc_days": 26,
+          "halts": false,
+          "target_exits": 53,
+          "mean_pnl": -7.129523916373491
+        },
+        "through": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.013967602739179963,
+          "max_drawdown": -0.015710427465879806,
+          "trades": 47,
+          "win_rate": 0.6808510638297872,
+          "profit_factor": 0.3143917615986158,
+          "active_utc_days": 22,
+          "halts": false,
+          "target_exits": 32,
+          "mean_pnl": -29.718303700384478
+        }
+      },
+      "minimum_return": -0.013967602739179963
+    },
+    {
+      "filter": "mean_discount",
+      "entry_offset": 2,
+      "target_ticks": 2,
+      "models": {
+        "touch": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.02344933598125909,
+          "max_drawdown": -0.004719485141413182,
+          "trades": 90,
+          "win_rate": 0.8444444444444444,
+          "profit_factor": 2.380591015347044,
+          "active_utc_days": 31,
+          "halts": false,
+          "target_exits": 76,
+          "mean_pnl": 26.054817756954158
+        },
+        "sampled": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.0031121807563403436,
+          "max_drawdown": -0.011254123198438437,
+          "trades": 62,
+          "win_rate": 0.6451612903225806,
+          "profit_factor": 0.8708593643742459,
+          "active_utc_days": 26,
+          "halts": false,
+          "target_exits": 40,
+          "mean_pnl": -5.019646381195083
+        },
+        "through": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.017622099782302447,
+          "max_drawdown": -0.019683114508409427,
+          "trades": 45,
+          "win_rate": 0.4222222222222222,
+          "profit_factor": 0.3605105579566993,
+          "active_utc_days": 22,
+          "halts": false,
+          "target_exits": 19,
+          "mean_pnl": -39.160221738449366
+        }
+      },
+      "minimum_return": -0.017622099782302447
+    },
+    {
+      "filter": "floor_bounce",
+      "entry_offset": 2,
+      "target_ticks": 1,
+      "models": {
+        "touch": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.05354465935549868,
+          "max_drawdown": -0.0020085136316504437,
+          "trades": 277,
+          "win_rate": 0.9927797833935018,
+          "profit_factor": 18.391902055752958,
+          "active_utc_days": 38,
+          "halts": false,
+          "target_exits": 275,
+          "mean_pnl": 19.330201933392864
+        },
+        "sampled": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.020446797599675604,
+          "max_drawdown": -0.005421483158809415,
+          "trades": 194,
+          "win_rate": 0.9432989690721649,
+          "profit_factor": 2.2188028681662333,
+          "active_utc_days": 38,
+          "halts": false,
+          "target_exits": 183,
+          "mean_pnl": 10.539586391585273
+        },
+        "through": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.024412569102155057,
+          "max_drawdown": -0.025511174287272897,
+          "trades": 62,
+          "win_rate": 0.5161290322580645,
+          "profit_factor": 0.20920021389152485,
+          "active_utc_days": 28,
+          "halts": true,
+          "target_exits": 32,
+          "mean_pnl": -39.37511145508958
+        }
+      },
+      "minimum_return": -0.024412569102155057
+    },
+    {
+      "filter": "floor_bounce",
+      "entry_offset": 1,
+      "target_ticks": 2,
+      "models": {
+        "touch": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.01957068594002065,
+          "max_drawdown": -0.0183496767523329,
+          "trades": 438,
+          "win_rate": 0.6552511415525114,
+          "profit_factor": 1.1451032105495096,
+          "active_utc_days": 38,
+          "halts": false,
+          "target_exits": 287,
+          "mean_pnl": 4.468193136990953
+        },
+        "sampled": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.023394788049926563,
+          "max_drawdown": -0.025025362580653243,
+          "trades": 239,
+          "win_rate": 0.5355648535564853,
+          "profit_factor": 0.744908325967353,
+          "active_utc_days": 27,
+          "halts": true,
+          "target_exits": 128,
+          "mean_pnl": -9.788614246831903
+        },
+        "through": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.02493678044865355,
+          "max_drawdown": -0.025087500580922018,
+          "trades": 42,
+          "win_rate": 0.16666666666666666,
+          "profit_factor": 0.11882492392017781,
+          "active_utc_days": 7,
+          "halts": true,
+          "target_exits": 6,
+          "mean_pnl": -59.373286782509275
+        }
+      },
+      "minimum_return": -0.02493678044865355
+    },
+    {
+      "filter": "stationary_floor",
+      "entry_offset": 1,
+      "target_ticks": 2,
+      "models": {
+        "touch": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.05219664521513434,
+          "max_drawdown": -0.004218036179317153,
+          "trades": 222,
+          "win_rate": 0.8243243243243243,
+          "profit_factor": 2.1386057074996447,
+          "active_utc_days": 37,
+          "halts": false,
+          "target_exits": 183,
+          "mean_pnl": 23.512002349159253
+        },
+        "sampled": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.02418785851628813,
+          "max_drawdown": -0.025256277121797344,
+          "trades": 163,
+          "win_rate": 0.588957055214724,
+          "profit_factor": 0.6714135436114936,
+          "active_utc_days": 36,
+          "halts": true,
+          "target_exits": 96,
+          "mean_pnl": -14.839177003857383
+        },
+        "through": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.02503223347545236,
+          "max_drawdown": -0.02503223347545236,
+          "trades": 40,
+          "win_rate": 0.275,
+          "profit_factor": 0.1713477060269448,
+          "active_utc_days": 16,
+          "halts": true,
+          "target_exits": 9,
+          "mean_pnl": -62.58058368863069
+        }
+      },
+      "minimum_return": -0.02503223347545236
+    },
+    {
+      "filter": "mean_discount",
+      "entry_offset": 1,
+      "target_ticks": 1,
+      "models": {
+        "touch": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.02606752087624642,
+          "max_drawdown": -0.0027354826306016378,
+          "trades": 198,
+          "win_rate": 0.9595959595959596,
+          "profit_factor": 3.132493152591682,
+          "active_utc_days": 37,
+          "halts": false,
+          "target_exits": 190,
+          "mean_pnl": 13.165414583962377
+        },
+        "sampled": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.010743580426829324,
+          "max_drawdown": -0.013428477081668722,
+          "trades": 142,
+          "win_rate": 0.8309859154929577,
+          "profit_factor": 0.6853048132450162,
+          "active_utc_days": 37,
+          "halts": false,
+          "target_exits": 118,
+          "mean_pnl": -7.565901709034113
+        },
+        "through": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.02503961558864165,
+          "max_drawdown": -0.02503961558864165,
+          "trades": 46,
+          "win_rate": 0.45652173913043476,
+          "profit_factor": 0.15059832148598082,
+          "active_utc_days": 17,
+          "halts": true,
+          "target_exits": 21,
+          "mean_pnl": -54.43394693182821
+        }
+      },
+      "minimum_return": -0.02503961558864165
+    },
+    {
+      "filter": "stationary_floor",
+      "entry_offset": 2,
+      "target_ticks": 2,
+      "models": {
+        "touch": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.02568422300180484,
+          "max_drawdown": -0.005297403718715343,
+          "trades": 102,
+          "win_rate": 0.8431372549019608,
+          "profit_factor": 2.284991070164805,
+          "active_utc_days": 34,
+          "halts": false,
+          "target_exits": 86,
+          "mean_pnl": 25.180610786082653
+        },
+        "sampled": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.00230013279561736,
+          "max_drawdown": -0.010146826707319034,
+          "trades": 74,
+          "win_rate": 0.7162162162162162,
+          "profit_factor": 1.0906691701520048,
+          "active_utc_days": 32,
+          "halts": false,
+          "target_exits": 53,
+          "mean_pnl": 3.108287561643974
+        },
+        "through": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.0251127554301539,
+          "max_drawdown": -0.0251127554301539,
+          "trades": 48,
+          "win_rate": 0.3541666666666667,
+          "profit_factor": 0.2580314537877001,
+          "active_utc_days": 27,
+          "halts": true,
+          "target_exits": 17,
+          "mean_pnl": -52.31824047948758
+        }
+      },
+      "minimum_return": -0.0251127554301539
+    },
+    {
+      "filter": "floor_bounce",
+      "entry_offset": 2,
+      "target_ticks": 2,
+      "models": {
+        "touch": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.07151285750608283,
+          "max_drawdown": -0.005524730855805293,
+          "trades": 263,
+          "win_rate": 0.8250950570342205,
+          "profit_factor": 2.4995455850370885,
+          "active_utc_days": 38,
+          "halts": false,
+          "target_exits": 217,
+          "mean_pnl": 27.191200572655376
+        },
+        "sampled": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.005817788747510377,
+          "max_drawdown": -0.01392879902481392,
+          "trades": 178,
+          "win_rate": 0.6573033707865169,
+          "profit_factor": 1.102372258919234,
+          "active_utc_days": 38,
+          "halts": false,
+          "target_exits": 117,
+          "mean_pnl": 3.2684206446682795
+        },
+        "through": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.02516234402078732,
+          "max_drawdown": -0.025684275690265768,
+          "trades": 53,
+          "win_rate": 0.3018867924528302,
+          "profit_factor": 0.22320570196163664,
+          "active_utc_days": 25,
+          "halts": true,
+          "target_exits": 13,
+          "mean_pnl": -47.476120793937305
+        }
+      },
+      "minimum_return": -0.02516234402078732
+    },
+    {
+      "filter": "stationary_floor",
+      "entry_offset": 1,
+      "target_ticks": 1,
+      "models": {
+        "touch": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.03596912841652222,
+          "max_drawdown": -0.002021775171939133,
+          "trades": 230,
+          "win_rate": 0.9739130434782609,
+          "profit_factor": 4.945706335307891,
+          "active_utc_days": 37,
+          "halts": false,
+          "target_exits": 224,
+          "mean_pnl": 15.638751485444276
+        },
+        "sampled": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.003667794492055787,
+          "max_drawdown": -0.007863362655383566,
+          "trades": 174,
+          "win_rate": 0.8908045977011494,
+          "profit_factor": 1.1364918356079947,
+          "active_utc_days": 37,
+          "halts": false,
+          "target_exits": 155,
+          "mean_pnl": 2.107927868997013
+        },
+        "through": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.025241136107409523,
+          "max_drawdown": -0.025241136107409523,
+          "trades": 50,
+          "win_rate": 0.48,
+          "profit_factor": 0.16737406657977053,
+          "active_utc_days": 18,
+          "halts": true,
+          "target_exits": 24,
+          "mean_pnl": -50.48227221482035
+        }
+      },
+      "minimum_return": -0.025241136107409523
+    },
+    {
+      "filter": "stationary_floor",
+      "entry_offset": 2,
+      "target_ticks": 1,
+      "models": {
+        "touch": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.013647782343555015,
+          "max_drawdown": -0.0033126667557481504,
+          "trades": 103,
+          "win_rate": 0.9611650485436893,
+          "profit_factor": 3.284912999055538,
+          "active_utc_days": 34,
+          "halts": false,
+          "target_exits": 99,
+          "mean_pnl": 13.250274119956588
+        },
+        "sampled": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.003980133712572553,
+          "max_drawdown": -0.010933563416373082,
+          "trades": 75,
+          "win_rate": 0.8533333333333334,
+          "profit_factor": 0.758530982468979,
+          "active_utc_days": 32,
+          "halts": false,
+          "target_exits": 64,
+          "mean_pnl": -5.306844950096575
+        },
+        "through": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.025420589748468392,
+          "max_drawdown": -0.025420589748468392,
+          "trades": 45,
+          "win_rate": 0.5111111111111111,
+          "profit_factor": 0.15149463678103572,
+          "active_utc_days": 25,
+          "halts": true,
+          "target_exits": 23,
+          "mean_pnl": -56.49019944104025
+        }
+      },
+      "minimum_return": -0.025420589748468392
+    },
+    {
+      "filter": "floor_bounce",
+      "entry_offset": 1,
+      "target_ticks": 1,
+      "models": {
+        "touch": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.09009572635040275,
+          "max_drawdown": -0.0032168364393162507,
+          "trades": 542,
+          "win_rate": 0.9723247232472325,
+          "profit_factor": 5.134991037934616,
+          "active_utc_days": 38,
+          "halts": false,
+          "target_exits": 527,
+          "mean_pnl": 16.622827739926546
+        },
+        "sampled": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.01898604104656454,
+          "max_drawdown": -0.01594236662325399,
+          "trades": 464,
+          "win_rate": 0.896551724137931,
+          "profit_factor": 1.2841788853622778,
+          "active_utc_days": 38,
+          "halts": false,
+          "target_exits": 416,
+          "mean_pnl": 4.091819191069934
+        },
+        "through": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.025540293789475532,
+          "max_drawdown": -0.025748382269174086,
+          "trades": 47,
+          "win_rate": 0.3404255319148936,
+          "profit_factor": 0.11778437037804008,
+          "active_utc_days": 8,
+          "halts": true,
+          "target_exits": 16,
+          "mean_pnl": -54.34105061590454
+        }
+      },
+      "minimum_return": -0.025540293789475532
+    },
+    {
+      "filter": "mean_discount",
+      "entry_offset": 1,
+      "target_ticks": 2,
+      "models": {
+        "touch": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": 0.04115778178177476,
+          "max_drawdown": -0.004434615648870599,
+          "trades": 193,
+          "win_rate": 0.8134715025906736,
+          "profit_factor": 1.9565225296613227,
+          "active_utc_days": 37,
+          "halts": false,
+          "target_exits": 157,
+          "mean_pnl": 21.32527553459831
+        },
+        "sampled": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.02481818536193192,
+          "max_drawdown": -0.025475959016601157,
+          "trades": 118,
+          "win_rate": 0.5847457627118644,
+          "profit_factor": 0.5919462092545841,
+          "active_utc_days": 31,
+          "halts": true,
+          "target_exits": 69,
+          "mean_pnl": -21.032360476213157
+        },
+        "through": {
+          "coin": "PEPE",
+          "start": "2026-09-01 00:00:00+00:00",
+          "end": "2026-10-09 00:00:00+00:00",
+          "return": -0.026450305143291164,
+          "max_drawdown": -0.026450305143291164,
+          "trades": 43,
+          "win_rate": 0.32558139534883723,
+          "profit_factor": 0.18496538613017238,
+          "active_utc_days": 15,
+          "halts": true,
+          "target_exits": 10,
+          "mean_pnl": -61.51233754253683
+        }
+      },
+      "minimum_return": -0.026450305143291164
+    }
+  ]
+}

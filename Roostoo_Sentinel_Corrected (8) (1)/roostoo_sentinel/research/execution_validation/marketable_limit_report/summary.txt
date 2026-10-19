@@ -1,0 +1,30 @@
+Roostoo tick bot summary
+Execution source: signed_roostoo_account
+Generated UTC: 2026-10-10T12:04:51+00:00
+Generated IST: 2026-10-10T17:34:51+05:30
+Phase: idle
+Pair: PEPE/USD
+Last portfolio equity USD: unavailable
+Conservative liquidation equity USD: unavailable
+Risk halt reasons: none recorded
+Total return from recorded baseline: unavailable
+Daily return (HKT): unavailable
+Last decision: unavailable
+hkt_day: 2026-10-10
+entry_attempts_today: 1
+accepted_entries_today: 1
+rejected_entries_today: 0
+unfilled_terminal_entries_today: 0
+filled_entries_today: 1
+filled_orders_today: 2
+completed_cycles_today: 1
+Total recorded filled orders: 2
+Total recorded completed cycles: 1
+Recorded realized P&L USD: -0.09000000
+Unresolved writes: 0
+Fee violation: {'order_id': 3450997, 'role': 'TAKER', 'fee': 0.001}
+Recorded HKT days with confirmed filled orders: 1
+Competition requires at least 8 active days with enough strategy trades each day. Recorded day count alone does not verify qualification.
+Persistent halt before 8 recorded trading days: False
+Submitted or canceled unfilled orders are not completed trades.
+These files are local exports. No email, Telegram or external delivery is configured.

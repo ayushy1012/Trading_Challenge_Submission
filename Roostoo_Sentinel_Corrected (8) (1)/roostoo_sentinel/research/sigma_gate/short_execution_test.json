@@ -1,0 +1,70 @@
+{
+  "purpose": "execution_classification_not_strategy_performance",
+  "starting_usd": 49999.87,
+  "account_source": "supplied near-$50,000 TEST wallet",
+  "supported": true,
+  "open_response": {
+    "Success": true,
+    "ID": 6205,
+    "Pair": "BTC/USD",
+    "OrderType": "MARKET",
+    "EntryPrice": 83024.03,
+    "ShortQty": 0.00024,
+    "Collateral": 19.92,
+    "OpenFee": 0.019925,
+    "Status": "OPEN",
+    "CreateTimestamp": 1791651631535
+  },
+  "position": {
+    "ID": 6205,
+    "Pair": "BTC/USD",
+    "EntryPrice": 83024.03,
+    "ShortQty": 0.00024,
+    "Collateral": 19.92,
+    "CurrentPrice": 83072.01,
+    "UnrealizedPNL": -0.011516,
+    "UnrealizedPNLPct": -0.000579,
+    "PositionValue": 19.908484,
+    "CreateTimestamp": 1791651631521,
+    "PositionStatus": "OPEN"
+  },
+  "accounts_while_open": {
+    "spot": {
+      "BNB": {
+        "Free": 0.0,
+        "Lock": 0.0
+      },
+      "PEPE": {
+        "Free": 0.0,
+        "Lock": 0.0
+      },
+      "USD": {
+        "Free": 49979.93,
+        "Lock": 19.92
+      }
+    },
+    "margin": {},
+    "schema": "SpotWallet"
+  },
+  "quote_while_open": {
+    "MaxBid": 83062.25,
+    "MinAsk": 83062.26,
+    "LastPrice": 83062.25,
+    "Change": 0.004,
+    "CoinTradeValue": 8723.23425,
+    "UnitTradeValue": 721569002.5494899
+  },
+  "close_response": {
+    "Success": true,
+    "ClosePrice": 83062.26,
+    "RealizedPNL": -0.009175199999999023,
+    "CloseFee": 0.019934,
+    "ReturnAmount": 19.890890800000005,
+    "ClosedQty": 0.00024,
+    "FullyClosed": true
+  },
+  "ending_usd": 49999.82,
+  "cash_change": -0.05,
+  "remaining_positions": 0,
+  "pending_orders": 0
+}

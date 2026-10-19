@@ -1,0 +1,29 @@
+{
+  "total_return": 0.211310213923241,
+  "ann_vol": 0.1635758916591827,
+  "sharpe": 0.9460962581611538,
+  "sortino": 1.34269739530352,
+  "max_drawdown": 0.10346410119651406,
+  "calmar": 1.467780329373087,
+  "calmar_raw": 2.0423529657102026,
+  "composite": 1.2612419343816959,
+  "psr_vs_0": 0.8646448087082049,
+  "fees_paid": 3136.445903056511,
+  "turnover_x_nav": 40.71022593172438,
+  "n_trades": 561,
+  "periods": 11878,
+  "source": "independent_reference_simulation",
+  "start": "2025-05-25 10:00:00+00:00",
+  "end_exclusive": "2026-10-02 09:00:00+00:00",
+  "same_close_market_fills": true,
+  "terminal_liquidation_fee_charged": false,
+  "published_return": 0.20870052806691097,
+  "maker_share": 0.4591360861928498,
+  "half_spread_proxy_bps": {
+    "BTC/USD": 0.2,
+    "ETH/USD": 0.2,
+    "SOL/USD": 0.5142445747197367,
+    "BNB/USD": 0.2,
+    "XRP/USD": 0.7970667941973538
+  }
+}

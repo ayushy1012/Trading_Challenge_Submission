@@ -1,0 +1,12 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+runtime/
+data/
+research/raw/
+*.sqlite*
+*.lock
+tmp/
+*.egg-info/
+PACKAGE_MANIFEST.json

@@ -1,0 +1,738 @@
+{
+  "read_only": true,
+  "timestamp_ms": 1791633049491,
+  "owned_orders": [
+    {
+      "Pair": "PEPE/USD",
+      "OrderID": 3450952,
+      "Status": "PENDING",
+      "Role": "MAKER",
+      "ServerTimeUsage": 0.005912873,
+      "CreateTimestamp": 1791632995962,
+      "FinishTimestamp": 0,
+      "Side": "BUY",
+      "Type": "LIMIT",
+      "StopType": "GTC",
+      "Price": 4.02e-06,
+      "Quantity": 24875621,
+      "FilledQuantity": 24875621,
+      "FilledAverPrice": 0,
+      "CoinChange": 0,
+      "UnitChange": 0,
+      "CommissionCoin": "PEPE",
+      "CommissionChargeValue": 0,
+      "CommissionPercent": 0.0005,
+      "OrderWalletType": "SPOT",
+      "OrderSource": "PUBLIC_API"
+    }
+  ],
+  "accounts": {
+    "spot": {
+      "BNB": {
+        "Free": 0.0,
+        "Lock": 0.0
+      },
+      "USD": {
+        "Free": 49899.96,
+        "Lock": 99.99
+      }
+    },
+    "margin": {},
+    "schema": "SpotWallet"
+  },
+  "quotes": {
+    "Success": true,
+    "ErrMsg": "",
+    "ServerTime": 1791633061865,
+    "Data": {
+      "1000CHEEMS/USD": {
+        "MaxBid": 0.000513,
+        "MinAsk": 0.000514,
+        "LastPrice": 0.000513,
+        "Change": 0.0138,
+        "CoinTradeValue": 446705256,
+        "UnitTradeValue": 227383.585005
+      },
+      "AAVE/USD": {
+        "MaxBid": 172.85,
+        "MinAsk": 172.86,
+        "LastPrice": 172.86,
+        "Change": 0.0212,
+        "CoinTradeValue": 118701.842,
+        "UnitTradeValue": 20265697.97837
+      },
+      "ADA/USD": {
+        "MaxBid": 0.2555,
+        "MinAsk": 0.2556,
+        "LastPrice": 0.2556,
+        "Change": 0.0645,
+        "CoinTradeValue": 160219090.5,
+        "UnitTradeValue": 39722787.58459
+      },
+      "AMDB/USD": {
+        "MaxBid": 608.98,
+        "MinAsk": 609.15,
+        "LastPrice": 609.04,
+        "Change": -0.0377,
+        "CoinTradeValue": 2353.772,
+        "UnitTradeValue": 1439989.65237
+      },
+      "APT/USD": {
+        "MaxBid": 0.8172,
+        "MinAsk": 0.8173,
+        "LastPrice": 0.8173,
+        "Change": -0.0032,
+        "CoinTradeValue": 14645044.45,
+        "UnitTradeValue": 11904935.594382
+      },
+      "ARB/USD": {
+        "MaxBid": 0.1848,
+        "MinAsk": 0.1849,
+        "LastPrice": 0.1848,
+        "Change": 0.026,
+        "CoinTradeValue": 49488508.5,
+        "UnitTradeValue": 9006640.21278
+      },
+      "ASTER/USD": {
+        "MaxBid": 0.7083,
+        "MinAsk": 0.7084,
+        "LastPrice": 0.7083,
+        "Change": 0.0094,
+        "CoinTradeValue": 13873899.64,
+        "UnitTradeValue": 9742328.427202
+      },
+      "AVAX/USD": {
+        "MaxBid": 10.603,
+        "MinAsk": 10.604,
+        "LastPrice": 10.603,
+        "Change": 0.0153,
+        "CoinTradeValue": 2655637.71,
+        "UnitTradeValue": 27545023.89653
+      },
+      "AVNT/USD": {
+        "MaxBid": 0.1358,
+        "MinAsk": 0.1359,
+        "LastPrice": 0.1358,
+        "Change": -0.0023,
+        "CoinTradeValue": 8341599.4,
+        "UnitTradeValue": 1142905.31136
+      },
+      "BIO/USD": {
+        "MaxBid": 0.02879,
+        "MinAsk": 0.0288,
+        "LastPrice": 0.02878,
+        "Change": 0.0202,
+        "CoinTradeValue": 37328459.7,
+        "UnitTradeValue": 1064205.441023
+      },
+      "BMT/USD": {
+        "MaxBid": 0.01976,
+        "MinAsk": 0.01977,
+        "LastPrice": 0.01976,
+        "Change": 0.0482,
+        "CoinTradeValue": 21444409.9,
+        "UnitTradeValue": 421808.186614
+      },
+      "BNB/USD": {
+        "MaxBid": 748.94,
+        "MinAsk": 748.95,
+        "LastPrice": 748.94,
+        "Change": 0.0064,
+        "CoinTradeValue": 66644.719,
+        "UnitTradeValue": 49577560.56353
+      },
+      "BONK/USD": {
+        "MaxBid": 3.4e-06,
+        "MinAsk": 3.41e-06,
+        "LastPrice": 3.41e-06,
+        "Change": 0.0118,
+        "CoinTradeValue": 381757037730,
+        "UnitTradeValue": 1289329.08752733
+      },
+      "BTC/USD": {
+        "MaxBid": 82888,
+        "MinAsk": 82888.01,
+        "LastPrice": 82888.01,
+        "Change": -0.0043,
+        "CoinTradeValue": 10549.28486,
+        "UnitTradeValue": 873103061.6618882
+      },
+      "CAKE/USD": {
+        "MaxBid": 2.224,
+        "MinAsk": 2.225,
+        "LastPrice": 2.225,
+        "Change": 0.0164,
+        "CoinTradeValue": 1919833.52,
+        "UnitTradeValue": 4204297.27523
+      },
+      "CBRSB/USD": {
+        "MaxBid": 164.87,
+        "MinAsk": 164.94,
+        "LastPrice": 164.71,
+        "Change": -0.0305,
+        "CoinTradeValue": 3570.175,
+        "UnitTradeValue": 591401.27112
+      },
+      "CFX/USD": {
+        "MaxBid": 0.0513,
+        "MinAsk": 0.05132,
+        "LastPrice": 0.0513,
+        "Change": 0.0206,
+        "CoinTradeValue": 24400934,
+        "UnitTradeValue": 1239995.59153
+      },
+      "COINB/USD": {
+        "MaxBid": 181.01,
+        "MinAsk": 181.06,
+        "LastPrice": 181.01,
+        "Change": 0.0272,
+        "CoinTradeValue": 7218.686,
+        "UnitTradeValue": 1293543.18384
+      },
+      "CRCLB/USD": {
+        "MaxBid": 85.48,
+        "MinAsk": 85.49,
+        "LastPrice": 85.49,
+        "Change": 0.0342,
+        "CoinTradeValue": 212514.5,
+        "UnitTradeValue": 18059814.5179
+      },
+      "CRV/USD": {
+        "MaxBid": 0.3575,
+        "MinAsk": 0.3576,
+        "LastPrice": 0.3575,
+        "Change": 0.0185,
+        "CoinTradeValue": 14057127,
+        "UnitTradeValue": 5023613.23198
+      },
+      "DOGE/USD": {
+        "MaxBid": 0.08591,
+        "MinAsk": 0.08592,
+        "LastPrice": 0.08591,
+        "Change": 0.0097,
+        "CoinTradeValue": 392497714,
+        "UnitTradeValue": 33518063.92777
+      },
+      "DOT/USD": {
+        "MaxBid": 1.252,
+        "MinAsk": 1.253,
+        "LastPrice": 1.253,
+        "Change": 0.0636,
+        "CoinTradeValue": 14215141.52,
+        "UnitTradeValue": 17513730.18217
+      },
+      "EDEN/USD": {
+        "MaxBid": 0.06079,
+        "MinAsk": 0.06085,
+        "LastPrice": 0.06079,
+        "Change": -0.0197,
+        "CoinTradeValue": 7497778,
+        "UnitTradeValue": 456049.955506
+      },
+      "EIGEN/USD": {
+        "MaxBid": 0.227,
+        "MinAsk": 0.2272,
+        "LastPrice": 0.2271,
+        "Change": 0.0133,
+        "CoinTradeValue": 26164206.2,
+        "UnitTradeValue": 5794735.881399
+      },
+      "ENA/USD": {
+        "MaxBid": 0.2217,
+        "MinAsk": 0.2218,
+        "LastPrice": 0.2218,
+        "Change": 0.0193,
+        "CoinTradeValue": 133156785.09,
+        "UnitTradeValue": 28912917.997859
+      },
+      "ETH/USD": {
+        "MaxBid": 2497.95,
+        "MinAsk": 2497.96,
+        "LastPrice": 2497.95,
+        "Change": -0.0039,
+        "CoinTradeValue": 110729.2822,
+        "UnitTradeValue": 275816653.298559
+      },
+      "FET/USD": {
+        "MaxBid": 0.2269,
+        "MinAsk": 0.227,
+        "LastPrice": 0.227,
+        "Change": 0.0266,
+        "CoinTradeValue": 90545309.5,
+        "UnitTradeValue": 20016536.71706
+      },
+      "FIL/USD": {
+        "MaxBid": 1.1337,
+        "MinAsk": 1.1338,
+        "LastPrice": 1.1337,
+        "Change": 0.0468,
+        "CoinTradeValue": 15198955.78,
+        "UnitTradeValue": 17317402.974838
+      },
+      "FLOKI/USD": {
+        "MaxBid": 2.765e-05,
+        "MinAsk": 2.766e-05,
+        "LastPrice": 2.766e-05,
+        "Change": 0.0184,
+        "CoinTradeValue": 60782871909,
+        "UnitTradeValue": 1677612.21959509
+      },
+      "FORM/USD": {
+        "MaxBid": 0.2765,
+        "MinAsk": 0.2767,
+        "LastPrice": 0.2767,
+        "Change": 0.0343,
+        "CoinTradeValue": 2697395.2,
+        "UnitTradeValue": 731239.60181
+      },
+      "GLWB/USD": {
+        "MaxBid": 155.88,
+        "MinAsk": 156,
+        "LastPrice": 155.86,
+        "Change": -0.0128,
+        "CoinTradeValue": 1145.825,
+        "UnitTradeValue": 177623.1597
+      },
+      "GOOGLB/USD": {
+        "MaxBid": 352.18,
+        "MinAsk": 352.23,
+        "LastPrice": 352.23,
+        "Change": 0.0025,
+        "CoinTradeValue": 3412.388,
+        "UnitTradeValue": 1202467.57314
+      },
+      "HBAR/USD": {
+        "MaxBid": 0.09269,
+        "MinAsk": 0.0927,
+        "LastPrice": 0.09269,
+        "Change": 0.007,
+        "CoinTradeValue": 120337061,
+        "UnitTradeValue": 11022967.68083
+      },
+      "HEMI/USD": {
+        "MaxBid": 0.00579,
+        "MinAsk": 0.0058,
+        "LastPrice": 0.00579,
+        "Change": -0.0086,
+        "CoinTradeValue": 159667305.3,
+        "UnitTradeValue": 926946.965326
+      },
+      "ICP/USD": {
+        "MaxBid": 3.129,
+        "MinAsk": 3.13,
+        "LastPrice": 3.13,
+        "Change": 0.0388,
+        "CoinTradeValue": 2529248,
+        "UnitTradeValue": 7763096.30281
+      },
+      "INTCB/USD": {
+        "MaxBid": 104.94,
+        "MinAsk": 104.96,
+        "LastPrice": 104.96,
+        "Change": -0.0352,
+        "CoinTradeValue": 33038.88,
+        "UnitTradeValue": 3502802.407
+      },
+      "LINEA/USD": {
+        "MaxBid": 0.002811,
+        "MinAsk": 0.002812,
+        "LastPrice": 0.002812,
+        "Change": 0.0418,
+        "CoinTradeValue": 392080311,
+        "UnitTradeValue": 1087660.841413
+      },
+      "LINK/USD": {
+        "MaxBid": 12.945,
+        "MinAsk": 12.946,
+        "LastPrice": 12.946,
+        "Change": 0.0046,
+        "CoinTradeValue": 1070748.04,
+        "UnitTradeValue": 13762580.32687
+      },
+      "LISTA/USD": {
+        "MaxBid": 0.0808,
+        "MinAsk": 0.0809,
+        "LastPrice": 0.0809,
+        "Change": 0.0012,
+        "CoinTradeValue": 2495359.1,
+        "UnitTradeValue": 202407.25427
+      },
+      "LITEB/USD": {
+        "MaxBid": 1082.5,
+        "MinAsk": 1082.79,
+        "LastPrice": 1081.53,
+        "Change": -0.0319,
+        "CoinTradeValue": 1045.158,
+        "UnitTradeValue": 1160193.24096
+      },
+      "LTC/USD": {
+        "MaxBid": 63.78,
+        "MinAsk": 63.79,
+        "LastPrice": 63.79,
+        "Change": -0.0074,
+        "CoinTradeValue": 231922.787,
+        "UnitTradeValue": 14758854.31445
+      },
+      "METAB/USD": {
+        "MaxBid": 718.62,
+        "MinAsk": 718.63,
+        "LastPrice": 718.72,
+        "Change": -0.0102,
+        "CoinTradeValue": 585.965,
+        "UnitTradeValue": 421929.31078
+      },
+      "MIRA/USD": {
+        "MaxBid": 0.05009,
+        "MinAsk": 0.05011,
+        "LastPrice": 0.05011,
+        "Change": 0.0304,
+        "CoinTradeValue": 13511821.8,
+        "UnitTradeValue": 667338.662376
+      },
+      "MSFTB/USD": {
+        "MaxBid": 534.75,
+        "MinAsk": 534.97,
+        "LastPrice": 534.76,
+        "Change": 0.0098,
+        "CoinTradeValue": 408.674,
+        "UnitTradeValue": 218051.43714
+      },
+      "MSTRB/USD": {
+        "MaxBid": 155.79,
+        "MinAsk": 155.8,
+        "LastPrice": 155.77,
+        "Change": 0.0013,
+        "CoinTradeValue": 47342.051,
+        "UnitTradeValue": 7340548.84499
+      },
+      "MUB/USD": {
+        "MaxBid": 1034.19,
+        "MinAsk": 1034.27,
+        "LastPrice": 1034.18,
+        "Change": -0.0217,
+        "CoinTradeValue": 3314.382,
+        "UnitTradeValue": 3432893.21336
+      },
+      "NBISB/USD": {
+        "MaxBid": 222.84,
+        "MinAsk": 222.88,
+        "LastPrice": 222.93,
+        "Change": -0.0156,
+        "CoinTradeValue": 2274.546,
+        "UnitTradeValue": 505623.94261
+      },
+      "NEAR/USD": {
+        "MaxBid": 5.306,
+        "MinAsk": 5.307,
+        "LastPrice": 5.307,
+        "Change": 0.0863,
+        "CoinTradeValue": 26056421.5,
+        "UnitTradeValue": 129754415.2736
+      },
+      "NVDAB/USD": {
+        "MaxBid": 230.44,
+        "MinAsk": 230.45,
+        "LastPrice": 230.44,
+        "Change": -0.0162,
+        "CoinTradeValue": 14684.362,
+        "UnitTradeValue": 3394020.54761
+      },
+      "ONDO/USD": {
+        "MaxBid": 0.5006,
+        "MinAsk": 0.5007,
+        "LastPrice": 0.5005,
+        "Change": 0.0193,
+        "CoinTradeValue": 43975635.4,
+        "UnitTradeValue": 21459912.38275
+      },
+      "OPEN/USD": {
+        "MaxBid": 0.1103,
+        "MinAsk": 0.1104,
+        "LastPrice": 0.1104,
+        "Change": 0.0156,
+        "CoinTradeValue": 8725000.1,
+        "UnitTradeValue": 952976.83657
+      },
+      "PAXG/USD": {
+        "MaxBid": 4186.69,
+        "MinAsk": 4186.7,
+        "LastPrice": 4186.7,
+        "Change": 0.001,
+        "CoinTradeValue": 2277.4686,
+        "UnitTradeValue": 9535355.592859
+      },
+      "PENDLE/USD": {
+        "MaxBid": 2.139,
+        "MinAsk": 2.14,
+        "LastPrice": 2.139,
+        "Change": 0.0089,
+        "CoinTradeValue": 1116985.1,
+        "UnitTradeValue": 2354735.7868
+      },
+      "PENGU/USD": {
+        "MaxBid": 0.008369,
+        "MinAsk": 0.00837,
+        "LastPrice": 0.008369,
+        "Change": 0.0324,
+        "CoinTradeValue": 735179092,
+        "UnitTradeValue": 6036728.364249
+      },
+      "PEPE/USD": {
+        "MaxBid": 4.02e-06,
+        "MinAsk": 4.03e-06,
+        "LastPrice": 4.03e-06,
+        "Change": 0.0228,
+        "CoinTradeValue": 3773891583600,
+        "UnitTradeValue": 14925685.91374934
+      },
+      "PLTRB/USD": {
+        "MaxBid": 209.25,
+        "MinAsk": 209.36,
+        "LastPrice": 209.34,
+        "Change": 0.0437,
+        "CoinTradeValue": 513.566,
+        "UnitTradeValue": 104717.69366
+      },
+      "PLUME/USD": {
+        "MaxBid": 0.01887,
+        "MinAsk": 0.01888,
+        "LastPrice": 0.01888,
+        "Change": 0.0436,
+        "CoinTradeValue": 176779835,
+        "UnitTradeValue": 3234989.97766
+      },
+      "POL/USD": {
+        "MaxBid": 0.10062,
+        "MinAsk": 0.10063,
+        "LastPrice": 0.10062,
+        "Change": 0.0072,
+        "CoinTradeValue": 152612773,
+        "UnitTradeValue": 15226472.997596
+      },
+      "PUMP/USD": {
+        "MaxBid": 0.00564,
+        "MinAsk": 0.005642,
+        "LastPrice": 0.00564,
+        "Change": -0.0253,
+        "CoinTradeValue": 3987344772,
+        "UnitTradeValue": 21855427.516549
+      },
+      "QCOMB/USD": {
+        "MaxBid": 176.2,
+        "MinAsk": 176.35,
+        "LastPrice": 176.18,
+        "Change": -0.0042,
+        "CoinTradeValue": 1273.361,
+        "UnitTradeValue": 221383.94402
+      },
+      "S/USD": {
+        "MaxBid": 0.04287,
+        "MinAsk": 0.04289,
+        "LastPrice": 0.04286,
+        "Change": -0.047,
+        "CoinTradeValue": 90095233.2,
+        "UnitTradeValue": 3981433.104371
+      },
+      "SEI/USD": {
+        "MaxBid": 0.06745,
+        "MinAsk": 0.06746,
+        "LastPrice": 0.06745,
+        "Change": 0.0184,
+        "CoinTradeValue": 78098576.1,
+        "UnitTradeValue": 5193495.706281
+      },
+      "SHIB/USD": {
+        "MaxBid": 5.45e-06,
+        "MinAsk": 5.46e-06,
+        "LastPrice": 5.46e-06,
+        "Change": 0.0148,
+        "CoinTradeValue": 463543851087,
+        "UnitTradeValue": 2519851.71095357
+      },
+      "SKHYB/USD": {
+        "MaxBid": 170.77,
+        "MinAsk": 170.78,
+        "LastPrice": 170.78,
+        "Change": -0.0174,
+        "CoinTradeValue": 5765.166,
+        "UnitTradeValue": 984121.5906
+      },
+      "SNDKB/USD": {
+        "MaxBid": 1591.47,
+        "MinAsk": 1591.48,
+        "LastPrice": 1591.47,
+        "Change": -0.0327,
+        "CoinTradeValue": 5883.2401,
+        "UnitTradeValue": 9431137.69676
+      },
+      "SOL/USD": {
+        "MaxBid": 109.89,
+        "MinAsk": 109.9,
+        "LastPrice": 109.89,
+        "Change": -0.0121,
+        "CoinTradeValue": 1270384.859,
+        "UnitTradeValue": 139381420.2652
+      },
+      "SOMI/USD": {
+        "MaxBid": 0.2045,
+        "MinAsk": 0.2046,
+        "LastPrice": 0.2046,
+        "Change": -0.0336,
+        "CoinTradeValue": 1528967.8,
+        "UnitTradeValue": 315166.65509
+      },
+      "SPCXB/USD": {
+        "MaxBid": 163.39,
+        "MinAsk": 163.4,
+        "LastPrice": 163.39,
+        "Change": -0.0237,
+        "CoinTradeValue": 111191.791,
+        "UnitTradeValue": 18164494.17028
+      },
+      "STO/USD": {
+        "MaxBid": 0.0403,
+        "MinAsk": 0.0404,
+        "LastPrice": 0.0404,
+        "Change": 0.0279,
+        "CoinTradeValue": 6419026.6,
+        "UnitTradeValue": 255663.75546
+      },
+      "SUI/USD": {
+        "MaxBid": 1.1222,
+        "MinAsk": 1.1223,
+        "LastPrice": 1.1223,
+        "Change": 0.0481,
+        "CoinTradeValue": 48970287.2,
+        "UnitTradeValue": 53163544.90536
+      },
+      "TAO/USD": {
+        "MaxBid": 283.4,
+        "MinAsk": 283.5,
+        "LastPrice": 283.4,
+        "Change": 0.0275,
+        "CoinTradeValue": 58819.9916,
+        "UnitTradeValue": 16330868.61227
+      },
+      "TRUMP/USD": {
+        "MaxBid": 1.896,
+        "MinAsk": 1.897,
+        "LastPrice": 1.896,
+        "Change": 0.0237,
+        "CoinTradeValue": 4002365.124,
+        "UnitTradeValue": 7511032.795573
+      },
+      "TRX/USD": {
+        "MaxBid": 0.3312,
+        "MinAsk": 0.3313,
+        "LastPrice": 0.3313,
+        "Change": -0.0052,
+        "CoinTradeValue": 67702814.7,
+        "UnitTradeValue": 22473906.75848
+      },
+      "TSLAB/USD": {
+        "MaxBid": 382.98,
+        "MinAsk": 383,
+        "LastPrice": 382.95,
+        "Change": 0.0055,
+        "CoinTradeValue": 8135.009,
+        "UnitTradeValue": 3131694.20903
+      },
+      "TUT/USD": {
+        "MaxBid": 0.02216,
+        "MinAsk": 0.02217,
+        "LastPrice": 0.02215,
+        "Change": -0.0036,
+        "CoinTradeValue": 47670216,
+        "UnitTradeValue": 1063430.41413
+      },
+      "UNI/USD": {
+        "MaxBid": 7.514,
+        "MinAsk": 7.515,
+        "LastPrice": 7.515,
+        "Change": 0.0148,
+        "CoinTradeValue": 5370005.72,
+        "UnitTradeValue": 39652564.08874
+      },
+      "VIRTUAL/USD": {
+        "MaxBid": 0.7372,
+        "MinAsk": 0.7374,
+        "LastPrice": 0.7373,
+        "Change": 0.0268,
+        "CoinTradeValue": 6301999.4,
+        "UnitTradeValue": 4591573.50827
+      },
+      "WDCB/USD": {
+        "MaxBid": 396.51,
+        "MinAsk": 396.75,
+        "LastPrice": 396.86,
+        "Change": -0.0036,
+        "CoinTradeValue": 431.983,
+        "UnitTradeValue": 170194.35842
+      },
+      "WIF/USD": {
+        "MaxBid": 0.2178,
+        "MinAsk": 0.2179,
+        "LastPrice": 0.2179,
+        "Change": 0.0249,
+        "CoinTradeValue": 7302164.63,
+        "UnitTradeValue": 1574838.663782
+      },
+      "WLD/USD": {
+        "MaxBid": 0.5459,
+        "MinAsk": 0.546,
+        "LastPrice": 0.546,
+        "Change": 0.0959,
+        "CoinTradeValue": 76699639.4,
+        "UnitTradeValue": 40916499.31596
+      },
+      "WLFI/USD": {
+        "MaxBid": 0.057,
+        "MinAsk": 0.0571,
+        "LastPrice": 0.0571,
+        "Change": 0.0515,
+        "CoinTradeValue": 104427474.3,
+        "UnitTradeValue": 5844985.13105
+      },
+      "XLM/USD": {
+        "MaxBid": 0.1969,
+        "MinAsk": 0.197,
+        "LastPrice": 0.1969,
+        "Change": 0.0118,
+        "CoinTradeValue": 39594345,
+        "UnitTradeValue": 7694316.9901
+      },
+      "XPL/USD": {
+        "MaxBid": 0.08695,
+        "MinAsk": 0.08696,
+        "LastPrice": 0.08694,
+        "Change": 0.0182,
+        "CoinTradeValue": 59458656.5,
+        "UnitTradeValue": 5063545.386271
+      },
+      "XRP/USD": {
+        "MaxBid": 1.4047,
+        "MinAsk": 1.4048,
+        "LastPrice": 1.4048,
+        "Change": 0.0036,
+        "CoinTradeValue": 63648824.5,
+        "UnitTradeValue": 88763885.66623
+      },
+      "ZEC/USD": {
+        "MaxBid": 1229.36,
+        "MinAsk": 1229.37,
+        "LastPrice": 1229.36,
+        "Change": -0.0079,
+        "CoinTradeValue": 84776.561,
+        "UnitTradeValue": 103259297.00377
+      },
+      "ZEN/USD": {
+        "MaxBid": 6.439,
+        "MinAsk": 6.441,
+        "LastPrice": 6.439,
+        "Change": -0.0018,
+        "CoinTradeValue": 267359.24,
+        "UnitTradeValue": 1711313.40902
+      }
+    }
+  }
+}

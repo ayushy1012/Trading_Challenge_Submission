@@ -1,0 +1,10 @@
+6d1d855c522933d755c0c35bd29fa914c141d566 2026-10-10T23:06:04+05:30 Keep complete NAV and fill evidence in a compact reproducible delivery
+e15294486a0a7ead7721fca8fa7830d8cb9254ee 2026-10-10T23:02:27+05:30 Validate Sigma execution and cost stress; deliver conservative allocation with honest short-horizon results
+924eebb6586189f2d6006eae2c5160810e97f0d1 2026-10-10T22:28:42+05:30 Freeze conservative Sigma selection before 2026 evaluation
+a3b7474ed0dbba0a0bc8e7e591e2c71adee295d2 2026-10-10T22:07:40+05:30 Pin Sigma Gate reference and prerecord causal improvement tests
+6c71997f1c5e95af3ec55450cc0e3a9764a0350d 2026-10-10T18:03:18+05:30 Record authenticated account check and clarify historical reports
+5f52ed3f3bebf9fc6ff184f1840a0a65d9b5a8c7 2026-10-10T17:57:26+05:30 Bind remote ledgers to verified accounts and preserve risk state across key rotation
+bc45230a255777388323e0e6be5374470786990e 2026-10-10T17:53:11+05:30 Add execution-aware quiet pullbacks, conservative evidence and authenticated research findings
+da762d46d057db8f3e95379b7de4623906a6ea4e 2026-10-10T17:32:46+05:30 Add bounded test-account classification of marketable LIMIT fees
+6877b29fc98f5aa0454ca2074a6a618d9130114b 2026-10-10T17:22:51+05:30 Reconcile pending quantity echoes against cent-truncated spot balances
+77590d999368f1229146682ebc2c75e233e40fe2 2026-10-10T17:14:09+05:30 Record authenticated read-only schema validation and current tick economics

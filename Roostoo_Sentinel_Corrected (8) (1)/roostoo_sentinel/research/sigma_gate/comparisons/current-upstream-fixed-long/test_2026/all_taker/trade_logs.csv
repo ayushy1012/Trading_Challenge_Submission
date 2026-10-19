@@ -1,0 +1,11 @@
+timestamp,pair,quantity_delta,price,role,fee_usd,reason,source,model
+2026-01-01T00:00:00+00:00,BTC/USD,0.22580000000000003,87656.979821,TAKER,19.792946043581804,next_open,historical_simulation,all_taker
+2026-01-01T00:00:00+00:00,ETH/USD,5.4565,2971.9521649999997,TAKER,16.2164569883225,next_open,historical_simulation,all_taker
+2026-01-01T00:00:00+00:00,SOL/USD,111.113,124.657464,TAKER,13.851064797432,next_open,historical_simulation,all_taker
+2026-01-01T00:00:00+00:00,BNB/USD,26.162,864.401431,TAKER,22.614470237822,next_open,historical_simulation,all_taker
+2026-01-01T00:00:00+00:00,XRP/USD,9515.5,1.8426342399999998,TAKER,17.533586110719998,next_open,historical_simulation,all_taker
+2026-01-01T18:00:00+00:00,BTC/USD,-0.22580000000000003,88307.54336200001,TAKER,19.939843291139606,risk_exit,historical_simulation,all_taker
+2026-01-01T18:00:00+00:00,ETH/USD,-5.4565,2990.135956,TAKER,16.315676843914,risk_exit,historical_simulation,all_taker
+2026-01-01T18:00:00+00:00,SOL/USD,-111.113,125.18248000000001,TAKER,13.909400900240001,risk_exit,historical_simulation,all_taker
+2026-01-01T18:00:00+00:00,BNB/USD,-26.162,859.899001,TAKER,22.496677664162,risk_exit,historical_simulation,all_taker
+2026-01-01T18:00:00+00:00,XRP/USD,-9515.5,1.86866311,TAKER,17.781263823205002,risk_exit,historical_simulation,all_taker
