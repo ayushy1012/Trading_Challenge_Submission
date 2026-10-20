@@ -28,7 +28,7 @@ The ML-only rows use the same hourly features, portfolio accounting and trading 
 
 Sharpe uses UTC daily net NAV returns, sample standard deviation, zero cash yield and a √365 annualization factor. Drawdown uses hourly net liquidation NAV. The raw summaries also retain hourly Sharpe; do not mix the two definitions. Returns in the table are period returns, not annualized returns.
 
-![Measured returns, drawdowns, monthly results and execution stress](research/hybrid/figures/hybrid_results_2026.png)
+<!-- ![Measured returns, drawdowns, monthly results and execution stress](research/hybrid/figures/hybrid_results_2026.png) -->
 
 ### 2026 hybrid trade and capital statistics
 
